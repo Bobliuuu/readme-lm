@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
-"""Sample from the README-LM neural net (numpy only) and write an animated
-typing SVG. Usage: gen.py OUT.svg [seed]"""
-import sys, html, numpy as np, random
-ALPHA = " abcdefghijklmnopqrstuvwxyz"; K = 6
-Z = np.load(__file__.rsplit("/", 1)[0] + "/lm_k6.npz") if "/" in __file__ else np.load("lm_k6.npz")
+"""README-LM sampler. The model weights are read FROM the README text itself
+(int8 base64 block between <!--LM-WEIGHTS-START/END--> markers). numpy only.
+Usage: gen.py README.md OUT.svg SEED [PROMPT]   (prints the generated text)"""
+import sys, re, io, base64, html, numpy as np
 
-def probs(ctx, temp):
-    e = Z["emb"][[ALPHA.index(c) for c in ctx]].reshape(-1)
-    h = np.tanh(Z["w0"] @ e + Z["b0"]); h = np.tanh(Z["w1"] @ h + Z["b1"])
-    l = (Z["w2"] @ h + Z["b2"]) / temp
-    p = np.exp(l - l.max()); return p / p.sum()
+def load(readme):
+    r = open(readme).read()
+    b = re.search(r"```\n(.*?)\n```", r.split("<!--LM-WEIGHTS-START-->")[1], re.S).group(1).replace("\n", "")
+    Q = np.load(io.BytesIO(base64.b64decode(b)))
+    m = {"emb": Q["emb"].astype(np.float32), "voc": "".join(chr(c) for c in Q["voc"]), "k": int(Q["k"])}
+    for n in "012":
+        m["w" + n] = Q["q" + n].astype(np.float32) * Q["s" + n].astype(np.float32); m["b" + n] = Q["b" + n].astype(np.float32)
+    m["params"] = sum(Q[x].size for x in ("emb", "q0", "q1", "q2", "b0", "b1", "b2"))
+    return m
 
-def sample(seed_text, n, temp, rng):
-    s = seed_text
+def sample(m, prompt, n, temp, rng, top_p=0.95):
+    voc, K = m["voc"], m["k"]
+    s = "".join(c for c in prompt if c in voc); ctx = [voc.index(c) for c in (" " * K + s)[-K:]]
+    out = s
     for _ in range(n):
-        p = probs(s[-K:], temp); s += ALPHA[rng.choice(27, p=p)]
-    return s
+        e = m["emb"][ctx].reshape(-1)
+        h = np.tanh(m["w0"] @ e + m["b0"]); h = np.tanh(m["w1"] @ h + m["b1"])
+        l = (m["w2"] @ h + m["b2"]) / temp; p = np.exp(l - l.max()); p /= p.sum()
+        o = np.argsort(-p); c = np.cumsum(p[o]); keep = o[: int((c < top_p).sum()) + 1]
+        q = p[keep] / p[keep].sum(); i = int(rng.choice(keep, p=q))
+        out += voc[i]; ctx = ctx[1:] + [i]
+    return out
 
 def wrap(s, w):
     lines, cur = [], ""
@@ -24,14 +34,14 @@ def wrap(s, w):
         else: cur = (cur + " " + word) if cur else word
     return lines + ([cur] if cur else [])
 
-def svg(prompt, text, temp, W=64, cw=9.0, lh=24):
+def svg(prompt, text, temp, meta, W=64, cw=9.0, lh=24):
     lines = wrap(text, W); N = sum(len(l) for l in lines)
     CPS = 14; typ = N / CPS; T = typ + 5   # seconds per loop
     H = 100 + lh * len(lines); width = int(W * cw + 56)
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{H}" viewBox="0 0 {width} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">',
          f'<rect width="{width}" height="{H}" rx="12" fill="#0d1117" stroke="#30363d"/>',
          '<circle cx="24" cy="22" r="6" fill="#ff5f56"/><circle cx="44" cy="22" r="6" fill="#ffbd2e"/><circle cx="64" cy="22" r="6" fill="#27c93f"/>',
-         f'<text x="88" y="27" font-size="12" fill="#8b949e">README-LM · neural MLP (92K params) · {K}-char context · temp {temp}</text>',
+         f'<text x="88" y="27" font-size="12" fill="#8b949e">README-LM · {meta} · temp {temp}</text>',
          f'<text x="28" y="62" font-size="13" fill="#58a6ff">prompt&gt; {html.escape(prompt)}</text>']
     done = 0; xs, ys, kt = [], [], []
     xs.append(28); ys.append(100 - 14); kt.append(0.0)
@@ -57,11 +67,12 @@ def svg(prompt, text, temp, W=64, cw=9.0, lh=24):
     return "\n".join(o)
 
 if __name__ == "__main__":
-    out = sys.argv[1]; seed = int(sys.argv[2]) if len(sys.argv) > 2 else 0
-    rng = np.random.default_rng(seed)
-    prompts = ["the model ", "a transformer ", "we compile ", "inside qwen "]
-    prompt = prompts[seed % len(prompts)]
-    pad = (" " * K + prompt)[-K:]
-    text = sample(prompt, 230, 0.7, rng).strip()
-    open(out, "w").write(svg(prompt.strip(), text, 0.7))
+    readme, out = sys.argv[1], sys.argv[2]; seed = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+    m = load(readme); rng = np.random.default_rng(seed)
+    prompts = ["The model ", "A transformer ", "We compile ", "Inside Qwen "]
+    prompt = (sys.argv[4] if len(sys.argv) > 4 and sys.argv[4].strip() else prompts[seed % len(prompts)])
+    prompt = "".join(c for c in prompt if c in m["voc"] and c != "\n")[:60]
+    text = re.sub(r"\s+", " ", sample(m, prompt + (" " if not prompt.endswith(" ") else ""), 300, 0.7, rng)).strip()
+    meta = f"neural MLP · {m['params']//1000}K params · {m['k']}-char context"
+    open(out, "w").write(svg(prompt.strip(), text, 0.7, meta))
     print(text)
