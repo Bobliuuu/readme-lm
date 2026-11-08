@@ -1,0 +1,14 @@
+*.pem
+*.key
+known_hosts
+.env
+vast_api_key
+sw.sh
+*.local.sh
+__pycache__/
+out/model_k1.*
+out/model_k2.*
+out/model_k4.*
+out/model_k5.*
+out/k3_full.md
+out/v/
