@@ -10,7 +10,7 @@ A README is a static document, so "a language model in a README" has to be answe
 
 | | **A. The fast one** (what the profile README runs) | **B. The pure-markup one** (no Action, no JavaScript, no runtime of ours) |
 |---|---|---|
-| Models | real GPT-2 small (124M, int8) and a 600K-parameter QA transformer that knows my GitHub | a toy neural net computed by GitHub's own renderer (works, verified live); an SVG-filter version (exact arithmetic verified, full model in progress) |
+| Models | real GPT-2 small (124M, int8) and a 600K-parameter QA transformer that knows my GitHub | a toy neural net computed by GitHub's own renderer (works, verified live); an SVG-filter version (every op exact in Chrome; the chained model does not render as one image) |
 | Weights live in | Markdown shards (`gpt2/`, `qa/weights.md`) and the profile README | the page itself |
 | Arithmetic done by | a numpy engine that is extracted from a Markdown document and run by a GitHub Action | GitHub's MediaWiki renderer evaluating `{{#expr}}` / the viewer's browser rendering an SVG filter graph |
 | Speed | seconds to minutes per reply | instant to render; tiny models only |
@@ -67,7 +67,7 @@ flowchart LR
     end
     subgraph pure["Pure markup (the secondary build)"]
         M1["GitHub's MediaWiki renderer<br/>{{#expr}} in the page<br/>WORKS (toy, verified live)"]
-        S1["Viewer's browser rendering an SVG filter graph<br/>exact 8-bit ops verified; full model in progress"]
+        S1["Viewer's browser rendering an SVG filter graph<br/>every op exact in Chrome; full chain blocked by render cost"]
     end
     subgraph probed["Probed, not shipped"]
         X["XSLT: works, Chrome removes it 2026-11-17"]
@@ -97,7 +97,7 @@ The goal was to push the arithmetic into the renderer as far as possible. Each s
 |---|---|---|---|
 | **GitHub's README renderer** | GitHub | strips `<style>`, inline SVG and animation, forms and scripts; its MathJax is typesetting only (no `\def`, no macros; live test) | cannot compute |
 | **MediaWiki `#expr`** | GitHub's renderer | a 2-character-context, 12-unit net evaluated live; 40/40 predictions and all 12 hidden units and 5 logits equal the reference on GitHub's production renderer | **works (toy)**: shipped as the pure-markup version |
-| **SVG filters** | viewer's browser, as a README `<img>` | exact 8-bit multiply, add, matvec, ReLU and lookup tables in Chrome; a 4-8-4 integer MLP matches numpy on 24/24 outputs; GitHub serves a filter SVG byte-identical (tested up to 8.2 MB) and Chrome renders the served copy pixel-identically | **most promising**; full QA model needs 8-bit retraining and is in progress |
+| **SVG filters** | viewer's browser, as a README `<img>` | 26 of 26 ops bit-exact in headless Chrome at real shapes (matmul, RMSNorm, RoPE, causal attention, argmax, and a glyph atlas that draws the predicted character); the QA model retrained with 8-bit activations matches the original's answers on 698 of 698 questions (96.4% with 2 levels of renderer noise); GitHub serves a filter SVG byte-identical (tested to 8.2 MB) and Chrome renders it identically | **the full token step does not render**: chaining 128-wide convolve layers costs exponentially in Chrome (0.2 s at depth 2, 7 s at depth 3, a crash at depth 4); valid at 1x pixel ratio only; an `<img>` has no input. A different layer design is untested |
 | **Liquid in Jekyll** | GitHub Pages build | exact arithmetic, real-model op chain matches numpy; about 82K to 115K multiply-accumulates per second | too slow: 17 to 22 minutes per answer against a 10-minute build limit (extrapolated) |
 | **XSLT** | browser (Pages) | the full QA answer generated in one transform, identical to numpy: 163 s in Chrome, 197 s in `xsltproc`, a 10.7 MB data file | dead end: Chrome removes XSLT from Stable on 2026-11-17, and XSLT can't read URL input |
 | **CSS + variable fonts** | browser (Pages) | every arithmetic block passes in Chrome; typed input works with no JS; sized at about 0.7 MB of fonts | last resort: 11 to 65 minutes per answer and 3 to 4 weeks of work (extrapolated); the reference implementation has no license, so none of its code is used |
@@ -106,11 +106,13 @@ The goal was to push the arithmetic into the renderer as far as possible. Each s
 
 ![Time to produce one QA answer, by where the arithmetic runs](docs/img/time-per-answer.svg)
 
-### Why SVG filters are the interesting one, and what limits them
+### SVG filters: exact ops, but the chain does not render
 
-Filter primitives are exact but only 8 bits wide, so the question is how much precision the model needs. In simulation, quantizing every activation to 8 bits keeps 87.5% of the QA model's answers exactly right without retraining (80% with the filter engine's own rounding noise), 10 bits keep 95%. The plan is quantization-aware retraining at 8 bits.
+Filter primitives are exact but only 8 bits wide, so the first question was how much precision the model needs. Without retraining, 8-bit activations keep 87.5% of the QA model's answers exactly right in simulation (80% with the filter engine's own rounding noise). Retraining at 8 bits fixes that: the retrained model matches the original's answer on all 698 menu and preset questions through a bit-exact integer reference, and still 96.4% if the renderer adds 2 levels of noise.
 
 ![Share of QA answers exactly equal to the reference, by activation precision](docs/img/precision.svg)
+
+Then every op was built as a filter graph and checked bit-exact in headless Chrome: 26 of 26 pass. The blocker is chaining. Chrome re-evaluates shared filter nodes once per consumer, so cost multiplies with every layer of neurons: a full token step (about 4,800 primitives, 3.2 MB) did not render within 240 s, and the chain only verifies as far as attention. The graph is also valid only at 1x device pixel ratio, and an `<img>` takes no input, so the context would be baked into the file. A product-based dense layer might fix the cost; it is untested. Details: [`trackD/svgops/REPORT.md`](trackD/svgops/REPORT.md); the 8-bit spec and integer reference: [`trackD/qat8/q8_spec.md`](trackD/qat8/q8_spec.md).
 
 ### What precomputed graphs can and cannot cover
 
@@ -175,6 +177,7 @@ GitHub stops rendering a README at 500 KiB, which limits this approach: states g
 - No substrate we tried runs a GPT-2-sized model inside a README. GitHub's renderer has no input-dependent arithmetic, so anything computed there is a fixed function of the file.
 - The QA model is mostly a lookup table in weights: near-exact phrasings work, unusual ones can fail (on held-out phrasings, character-4gram F1 was about 0.5). Its training facts were written by agents and not independently verified against the READMEs.
 - GPT-2 is a base language model, not a chat assistant; it continues text and can be wrong, repetitive or odd.
+- The SVG-filter version is not shipped: its ops are exact, but the chained model does not render in Chrome (see above).
 - Probe results come from local emulation of GitHub's renderers unless a report says it was checked on github.com.
 
 ## Credits

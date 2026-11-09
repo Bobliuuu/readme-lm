@@ -42,16 +42,18 @@ def fig_time():
 
 # ---------- 2. precision (dot plot) ----------
 def fig_precision():
-    pts = [("8-bit, with the\nfilter's own noise", 80.0), ("8-bit", 87.5), ("10-bit", 95.0), ("16-bit", 97.5)]
-    W, H, L, R, T, B = 760, 340, 70, 40, 84, 60; pw = W - L - R; ph = H - T - B
+    pts = [("8-bit,\nfilter noise", 80.0, 1), ("8-bit", 87.5, 1), ("10-bit", 95.0, 1), ("16-bit", 97.5, 1), ("8-bit,\nretrained", 100.0, 2), ("retrained,\n+-2 level noise", 96.4, 2)]
+    W, H, L, R, T, B = 760, 350, 70, 40, 100, 60; pw = W - L - R; ph = H - T - B
     Y = lambda v: T + ph - v / 100 * ph
-    o = [head(W, H, "Why 8 bits is the crux for SVG filters", "Simulated share of QA answers exactly equal to the reference, by activation precision (no retraining).")]
+    o = [head(W, H, "Why 8 bits is the crux for SVG filters", "Share of QA answers exactly equal to the reference, by activation precision.")]
+    o.append('<circle class="c1" cx="30" cy="70" r="5"/><text class="t2" x="42" y="74" font-size="12">no retraining (simulation)</text>')
+    o.append('<circle class="c2" cx="250" cy="70" r="5"/><text class="t2" x="262" y="74" font-size="12">retrained at 8 bits (measured through the integer reference, 698 questions)</text>')
     for v in (0, 25, 50, 75, 100):
         o.append(f'<line class="grid" x1="{L}" x2="{W-R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/><text class="t2" x="{L-10}" y="{Y(v)+4:.1f}" font-size="11" text-anchor="end">{v}%</text>')
-    for i, (lab, v) in enumerate(pts):
+    for i, (lab, v, ser) in enumerate(pts):
         x = L + pw * (i + 0.5) / len(pts)
-        o.append(f'<line class="s1" x1="{x:.1f}" x2="{x:.1f}" y1="{Y(0):.1f}" y2="{Y(v):.1f}" stroke-width="3" stroke-linecap="round" opacity="0.5"/><circle class="c1" cx="{x:.1f}" cy="{Y(v):.1f}" r="7"/>')
-        o.append(f'<text x="{x:.1f}" y="{Y(v)-14:.1f}" font-size="13" font-weight="600" text-anchor="middle">{v}%</text>')
+        o.append(f'<line class="s{ser}" x1="{x:.1f}" x2="{x:.1f}" y1="{Y(0):.1f}" y2="{Y(v):.1f}" stroke-width="3" stroke-linecap="round" opacity="0.5"/><circle class="c{ser}" cx="{x:.1f}" cy="{Y(v):.1f}" r="7"/>')
+        o.append(f'<text x="{x:.1f}" y="{Y(v)-14:.1f}" font-size="13" font-weight="600" text-anchor="middle">{v:.1f}%</text>')
         for j, line in enumerate(lab.split("\n")): o.append(f'<text class="t2" x="{x:.1f}" y="{H-B+22+j*15}" font-size="12" text-anchor="middle">{escape(line)}</text>')
     save("precision.svg", "".join(o))
 
