@@ -1,5 +1,34 @@
 # README-LM
 
+**A tiny transformer that answers questions about my GitHub, and the entire model lives inside a GitHub README.** No server: a GitHub Action reads the weights out of the README text and runs the forward pass in numpy. Live at [github.com/Bobliuuu](https://github.com/Bobliuuu): click a question, submit the prefilled issue, get an answer.
+
+## The model
+
+- 600K-parameter character-level transformer: 3 layers, d=128, 4 heads, RoPE, RMSNorm, tied embeddings.
+- **4-bit group-quantized weights** (quantization-aware training, group size 32), zlib-compressed and base64-encoded: ~417 KB, so the whole README is ~417 KiB and fits GitHub's 500 KiB rendering limit.
+- Trained on ~700 question/answer facts written from my public repos' READMEs (plus off-topic refusals), 110 epochs, memorization-heavy on purpose.
+- Questions outside my GitHub get a refusal; it has no general knowledge.
+
+## Honest limits
+
+It is a small, mostly-memorizing model: exact or near-exact questions about my repos are answered correctly; unusual phrasings can produce a wrong or garbled answer. Size is the constraint, not the idea: more facts need more parameters than fit in 500 KiB.
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `qa_model.py` | transformer + 4-bit fake-quant (QAT) |
+| `build_qa.py`, `qa/*.jsonl` | dataset: facts, phrasings, refusals |
+| `train_qa.py` | training (`python3 train_qa.py 110 0.0 final`) |
+| `export_qa.py` | pack int4 weights into a README between markers |
+| `qa_infer.py`, `ask.py`, `gen.py` | numpy inference (KV cache), animated SVG |
+
+## Clickable variant
+
+An earlier experiment compiles a smaller char-level model into pure Markdown links (no Action at all); that version is below.
+
+---
+
 **A real neural network, running inside a GitHub README. No JavaScript, no server, no API. Inference is you clicking links.**
 
 A tiny character-level neural language model (MLP, 3-character context, 92K parameters, trained in PyTorch on the READMEs of my public repos) is **compiled into pure Markdown**. Every possible 3-character context is a state. For each state the compiler runs the network's forward pass ahead of time and writes its top next-character predictions as links, with probabilities, pointing at the next state.

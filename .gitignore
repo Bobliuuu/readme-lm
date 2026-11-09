@@ -12,3 +12,9 @@ out/model_k4.*
 out/model_k5.*
 out/k3_full.md
 out/v/
+data2/
+data/
+*.pt
+*.log
+out/model_k*.md
+__pycache__/

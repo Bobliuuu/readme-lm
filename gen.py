@@ -41,8 +41,8 @@ def svg(prompt, text, temp, meta, W=64, cw=9.0, lh=24):
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{H}" viewBox="0 0 {width} {H}" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">',
          f'<rect width="{width}" height="{H}" rx="12" fill="#0d1117" stroke="#30363d"/>',
          '<circle cx="24" cy="22" r="6" fill="#ff5f56"/><circle cx="44" cy="22" r="6" fill="#ffbd2e"/><circle cx="64" cy="22" r="6" fill="#27c93f"/>',
-         f'<text x="88" y="27" font-size="12" fill="#8b949e">README-LM · {meta} · temp {temp}</text>',
-         f'<text x="28" y="62" font-size="13" fill="#58a6ff">prompt&gt; {html.escape(prompt)}</text>']
+         f'<text x="88" y="27" font-size="12" fill="#8b949e">README-LM · {meta}</text>',
+         f'<text x="28" y="62" font-size="13" fill="#58a6ff">ask&gt; {html.escape(prompt)}</text>']
     done = 0; xs, ys, kt = [], [], []
     xs.append(28); ys.append(100 - 14); kt.append(0.0)
     for i, ln in enumerate(lines):
