@@ -43,7 +43,7 @@ Open an issue in this repo and replace `example text` in the title with anything
 
 <div align="center"><img src="docs/gifs/issue-flow.gif" alt="Clicking a link in the README opens an issue with the title and body prefilled; the Action replies with the model's answer" width="760"></div>
 
-<sub>Real screenshots of the flow: click the link, the form opens prefilled, the Action replies with the answer and closes the issue. <a href="docs/gifs/issue-flow.mp4">MP4</a>.</sub>
+<sub>A real screen recording of the flow (no cuts): click the link, the form opens prefilled, the Action replies with the answer and closes the issue. <a href="docs/gifs/issue-flow.mp4">Watch the full video (MP4)</a>.</sub>
 
 - 🟠 **`gpt2:`** real GPT-2 small continues your text: [open one](https://www.github.com/Bobliuuu/readme-lm/issues/new?title=gpt2%3A+example+text&body=Just+hit+Submit.+A+GitHub+Action+runs+real+GPT-2+small+%28124M%29+on+the+text+after+the+colon+in+the+title%2C+then+updates+the+profile+animation.+Replace+%60example+text%60+in+the+title+with+your+own+text+first.).
 - 🟠 **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://www.github.com/Bobliuuu/readme-lm/issues/new?title=qa%3A+example+text&body=Just+hit+Submit.+A+GitHub+Action+runs+the+600K-parameter+QA+model+stored+inside+the+profile+README+and+updates+the+profile+animation+with+its+answer.+Replace+%60example+text%60+in+the+title+with+a+question+about+Jerry%27s+GitHub+first.). Anything off-topic gets a refusal.
