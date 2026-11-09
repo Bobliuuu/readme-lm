@@ -1,0 +1,98 @@
+[
+ {
+  "file": "01.jpg",
+  "caption": "1. Open the repo page",
+  "elapsed": null,
+  "src_epoch": "1794208173961"
+ },
+ {
+  "file": "02.jpg",
+  "caption": "2. Scroll to 'Try it now'",
+  "elapsed": null,
+  "src_epoch": "1794208181264"
+ },
+ {
+  "file": "03.jpg",
+  "caption": "3. Click the qa: link: the form opens prefilled",
+  "elapsed": null,
+  "src_epoch": "1794208188931"
+ },
+ {
+  "file": "04.jpg",
+  "caption": "4. Edit the title: qa: what is jerry building",
+  "elapsed": null,
+  "src_epoch": "1794208193652"
+ },
+ {
+  "file": "05.jpg",
+  "caption": "5. Click Create",
+  "elapsed": 1.0,
+  "src_epoch": "1794208203940"
+ },
+ {
+  "file": "06.jpg",
+  "caption": "6. Issue #12 created, Action starts",
+  "elapsed": 4.0,
+  "src_epoch": "1794208203941"
+ },
+ {
+  "file": "07.jpg",
+  "caption": "7. Waiting for the Action",
+  "elapsed": 8.4,
+  "src_epoch": "1794208208929"
+ },
+ {
+  "file": "08.jpg",
+  "caption": "8. Waiting for the Action",
+  "elapsed": 15.0,
+  "src_epoch": "1794208216015"
+ },
+ {
+  "file": "09.jpg",
+  "caption": "9. Workflow run: In progress",
+  "elapsed": 19.5,
+  "src_epoch": "1794208220353"
+ },
+ {
+  "file": "10.jpg",
+  "caption": "10. Still running",
+  "elapsed": 23.5,
+  "src_epoch": "1794208224592"
+ },
+ {
+  "file": "11.jpg",
+  "caption": "11. Still running",
+  "elapsed": 27.5,
+  "src_epoch": "1794208228530"
+ },
+ {
+  "file": "12.jpg",
+  "caption": "12. Bot answers, issue closed",
+  "elapsed": 35.0,
+  "src_epoch": "1794208235642"
+ },
+ {
+  "file": "13.jpg",
+  "caption": "13. The answer, from the in-README model",
+  "elapsed": 40.7,
+  "src_epoch": "1794208241236"
+ },
+ {
+  "file": "14.jpg",
+  "caption": "14. Profile page: image cache still shows the old answer",
+  "elapsed": 105.0,
+  "src_epoch": "1794208305431"
+ },
+ {
+  "file": "15.jpg",
+  "caption": "15. Profile after cache refresh: new answer typing",
+  "elapsed": 390.8,
+  "src_epoch": "1794208591306"
+ },
+ {
+  "file": "16.jpg",
+  "caption": "16. Profile animation: full new answer",
+  "elapsed": 398.8,
+  "src_epoch": "1794208599257"
+ }
+]
