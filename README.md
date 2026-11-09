@@ -108,7 +108,7 @@ GPT-2 small does not fit in one README (124M parameters against 500 KiB), so the
 python3 -c "import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+'python mdrt-engine\n(.*?)\n'+chr(96)*4,t,re.S).group(1))" mdrt/GPT2.md
 ```
 
-Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a laptop CPU. GitHub's renderer only displays these documents; the extracted engine does the arithmetic. The workflow `.github/workflows/ask.yml` writes an issue's text into the run block, runs the document, replies with the Markdown it produced, and renders the animation. It does no arithmetic of its own.
+Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a laptop CPU. GitHub's renderer only displays these documents; the extracted engine does the arithmetic. The profile repo's workflow (`.github/workflows/readme-lm.yml` in [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu/blob/main/.github/workflows/readme-lm.yml), which checks this repo out) writes an issue's text into the run block, runs the document, renders the animation into the profile's `assets/readme-lm.svg`, and replies. It does no arithmetic of its own.
 
 ### The pure-markup net (MediaWiki)
 
@@ -178,7 +178,7 @@ python3 build.py 3 5 0.04 100000 && python3 compose.py
 | `qa_infer.py`, `ask.py`, `gen.py` | numpy inference and animated SVGs |
 | `gpt2/` | GPT-2 shards, manifest, `run.py`, `convert.py` |
 | `mdrt/` | the executable documents `GPT2.md` and `QA.md`, their engines, `build_docs.py` |
-| `.github/workflows/ask.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:` and `qa:` flow |
+| (profile repo) `.github/workflows/readme-lm.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:`, `qa:`, `mediawiki:` and `svg:` flow: runs the engines and generators from this repo and rewrites the profile's `assets/readme-lm.svg` |
 | `graph/` | compiled click-through graphs and their compilers |
 | `trackB/`, `trackC/`, `trackD/` | probe reports and builds: GitHub renderer, five substrates, MediaWiki and SVG-filter work |
 | `docs/` | figure and diagram generator (`make_figs.py`) and the images used in this README |
