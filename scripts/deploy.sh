@@ -161,7 +161,7 @@ fi
 
 step "6/6 done"
 say "Open one of these, keep or edit the title text, and press Submit (the animation on https://github.com/$PROFILE updates in about a minute):"
-for t in qa gpt2 mediawiki svg; do say "  $t: https://github.com/$FORK/issues/new?template=$t.md"; done
+for t in qa gpt2 mediawiki svg; do say "  $t: https://github.com/$FORK/issues/new?title=$t%3A+example+text"; done
 say "If the form opens blank, create an issue titled like 'qa: what is this'."
 if [ "$TEST" = 1 ]; then
   if confirm "Open a test issue 'qa: example text' on $FORK now?"; then

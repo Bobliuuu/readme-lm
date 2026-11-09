@@ -12,7 +12,7 @@ scripts/deploy.sh --dry-run                               # 2. optional: print e
 scripts/deploy.sh                                         # 3. deploy (asks before every write)
 ```
 
-4. Open one of the links it prints (for example `https://github.com/YOU/readme-lm/issues/new?template=qa.md`), press **Submit new issue**, and watch `https://github.com/YOU/YOU` update in about a minute. `--test` does this step for you.
+4. Open one of the links it prints (for example `https://github.com/YOU/readme-lm/issues/new?title=qa%3A+example+text`), press **Submit new issue**, and watch `https://github.com/YOU/YOU` update in about a minute. `--test` does this step for you.
 
 Flags: `--owner NAME` (default: the account `gh` is logged in as), `--dry-run`, `--yes` (no questions), `--test`, `--rotate-key`. The script is idempotent: run it again any time. It refuses to run if it cannot verify `gh` auth.
 
