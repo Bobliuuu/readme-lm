@@ -7,6 +7,22 @@ Language models stored as Markdown. This repo holds three different things, with
 | 1. QA model | 600K-param char-level transformer that answers questions about my public repos | inside the README of my profile repo, [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu) (417 KiB total, under GitHub's 500 KiB render limit) | a GitHub Action in the profile repo, numpy | open an issue titled `ask: <question>` on the profile repo |
 | 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo, numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
 | 3. Clickable model | char-level MLP (3-character context, 92K params) compiled into 2,622 Markdown states | this README, as links | nowhere: no Action, no JavaScript, you click | [start here](#s-the) |
+| 4. Compiled link graphs | real GPT-2 (12 prompts) and the QA transformer (687 questions), as click-through pages in `graph/` | `graph/*.md` | nowhere: no Action, no JavaScript, you click precomputed predictions | [GPT-2 graphs](graph/gpt2/README.md) · [QA graph](graph/qa/README.md) |
+| 5. Executable Markdown (`mdrt`) | GPT-2 as a `.md` document: weights by reference, forward pass as a declarative program, run block | `gpt2/*.md` shards | `mdrt/mdrt.py`, a Markdown renderer we wrote (not GitHub's) | `python3 mdrt/mdrt.py mdrt/gpt2.md` |
+
+## 4. Compiled link graphs (`graph/`)
+
+Pure Markdown navigation, no Action and no JavaScript: GitHub renders the pages and you click.
+
+- `graph/gpt2/`: real GPT-2 small (read from the `gpt2/` shards), 12 prompts. Each state is the text so far; links are GPT-2's top-3 next tokens (probability at temperature 0.6, at least 8%), at most 2,000 states per prompt, with chain contraction (a run of single-continuation states becomes one link). Coverage is measured and shown in `graph/gpt2/README.md`: confident prompts keep a sampled text inside the graph for 12 tokens 29% to 64% of the time (`Question: What is the capital of France?`, `1, 2, 3, 4, 5,`), while open-ended prompts keep it for 8 tokens only about 1% to 17% of the time. Open-ended text explodes the state space.
+- `graph/qa/`: the 4-bit QA transformer compiled the same way for 687 menu questions. 70,325 raw states contract to 1,399 (about 50x). Following the top-probability links reproduces the model's greedy answer, and every answer path reaches an end state.
+- All links in both graphs resolve (checked).
+
+This is navigation of precomputed predictions, not computation. GitHub's renderer has no input-dependent arithmetic (see `trackB/PROBE.md`, which tests what its sanitizer keeps and strips), so a GPT-2 forward pass cannot run inside a rendered README.
+
+## 5. Executable Markdown (`mdrt/`)
+
+`mdrt/gpt2.md` is a Markdown document whose weights are referenced from the `gpt2/` shards, whose forward pass is a declarative program (`embed`, `layernorm`, `linear`, `attention`, `gelu`, `add`, `head`), and whose `mdrt-run` block requests generation. `mdrt/mdrt.py` renders it: it interprets the program once per token and writes the document with the generated tokens and top-3 candidates filled in. Greedy output for 24 tokens is identical to `gpt2/run.py` (verified), at about 47 s on a laptop CPU. The renderer is ours, not GitHub's.
 
 ## 1. QA model inside a README
 

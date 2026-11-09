@@ -1,0 +1,110 @@
+[
+ {
+  "prompt": "The capital of France is",
+  "states_raw": 2000,
+  "states": 1713,
+  "bytes": 244269,
+  "mass_d8": 0.1151,
+  "mass_d12": 0,
+  "maxdepth": 11
+ },
+ {
+  "prompt": "Question: What is the capital of France?\nAnswer:",
+  "states_raw": 2000,
+  "states": 1371,
+  "bytes": 269627,
+  "mass_d8": 0.5404,
+  "mass_d12": 0.2867,
+  "maxdepth": 16
+ },
+ {
+  "prompt": "Question: Who wrote Hamlet?\nAnswer:",
+  "states_raw": 2000,
+  "states": 1636,
+  "bytes": 255138,
+  "mass_d8": 0.0874,
+  "mass_d12": 0,
+  "maxdepth": 11
+ },
+ {
+  "prompt": "To be, or not to be,",
+  "states_raw": 2000,
+  "states": 1634,
+  "bytes": 209710,
+  "mass_d8": 0.0213,
+  "mass_d12": 0,
+  "maxdepth": 10
+ },
+ {
+  "prompt": "Roses are red, violets are",
+  "states_raw": 2000,
+  "states": 1472,
+  "bytes": 240767,
+  "mass_d8": 0.002,
+  "mass_d12": 0.0008,
+  "maxdepth": 16
+ },
+ {
+  "prompt": "1, 2, 3, 4, 5,",
+  "states_raw": 2000,
+  "states": 1497,
+  "bytes": 188326,
+  "mass_d8": 0.7065,
+  "mass_d12": 0.6416,
+  "maxdepth": 13
+ },
+ {
+  "prompt": "The Eiffel Tower is located in",
+  "states_raw": 2000,
+  "states": 1538,
+  "bytes": 236715,
+  "mass_d8": 0.1666,
+  "mass_d12": 0.0567,
+  "maxdepth": 12
+ },
+ {
+  "prompt": "Water boils at 100 degrees",
+  "states_raw": 2000,
+  "states": 1650,
+  "bytes": 216602,
+  "mass_d8": 0.0503,
+  "mass_d12": 0,
+  "maxdepth": 9
+ },
+ {
+  "prompt": "The meaning of life is",
+  "states_raw": 2000,
+  "states": 1679,
+  "bytes": 220558,
+  "mass_d8": 0.0569,
+  "mass_d12": 0,
+  "maxdepth": 10
+ },
+ {
+  "prompt": "Once upon a time",
+  "states_raw": 2000,
+  "states": 1694,
+  "bytes": 222487,
+  "mass_d8": 0.007,
+  "mass_d12": 0,
+  "maxdepth": 11
+ },
+ {
+  "prompt": "GitHub is",
+  "states_raw": 2000,
+  "states": 1644,
+  "bytes": 219813,
+  "mass_d8": 0.0796,
+  "mass_d12": 0,
+  "maxdepth": 10
+ },
+ {
+  "prompt": "Markdown is",
+  "states_raw": 2000,
+  "states": 1599,
+  "bytes": 204966,
+  "mass_d8": 0.0131,
+  "mass_d12": 0,
+  "maxdepth": 11
+ }
+]

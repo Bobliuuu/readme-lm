@@ -1,0 +1,1 @@
+<details name=g><summary>a</summary>x</details> <img src="data:image/svg+xml;base64,PHN2Zy8+"> <img src="https://x/a.svg"> <input type=radio name=r> <a href="#user-content-bar">t</a> <span style="color:red" class="a" id="q" hidden>s</span>

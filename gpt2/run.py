@@ -5,14 +5,14 @@ GPT-2 small (124M) in numpy. Weights AND tokenizer are read from the Markdown sh
 import sys, os, re, json, zlib, base64, glob, numpy as np, regex
 D = os.path.dirname(os.path.abspath(__file__))
 
-def read_shards(kind):
-    parts = sorted(glob.glob(f"{D}/{kind}/part-*.md")); b = []
+def read_shards(kind, d=None):
+    parts = sorted(glob.glob(f"{d or D}/{kind}/part-*.md")); b = []
     for p in parts: b.append(re.search(r"```\n(.*?)\n```", open(p).read(), re.S).group(1).replace("\n", ""))
     return zlib.decompress(base64.b64decode("".join(b)))
 
-def load_weights():
-    man = json.loads(re.search(r"```json\n(.*?)\n```", open(f"{D}/manifest.md").read(), re.S).group(1))["tensors"]
-    raw = memoryview(read_shards("weights")); off = 0; W = {}
+def load_weights(d=None):
+    man = json.loads(re.search(r"```json\n(.*?)\n```", open(f"{d or D}/manifest.md").read(), re.S).group(1))["tensors"]
+    raw = memoryview(read_shards("weights", d)); off = 0; W = {}
     for t in man:
         shape, n = tuple(t["shape"]), 1
         for s in t["shape"]: n *= s
@@ -32,8 +32,8 @@ def bytes_to_unicode():
     return dict(zip(bs, map(chr, cs)))
 PAT = regex.compile(r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
 class Tok:
-    def __init__(s):
-        t = json.loads(read_shards("tokenizer")); s.enc = t["vocab"]; s.dec = {v: k for k, v in s.enc.items()}
+    def __init__(s, d=None):
+        t = json.loads(read_shards("tokenizer", d)); s.enc = t["vocab"]; s.dec = {v: k for k, v in s.enc.items()}
         s.rank = {tuple(m.split()): i for i, m in enumerate(t["merges"])}; s.b2u = bytes_to_unicode(); s.u2b = {v: k for k, v in s.b2u.items()}; s.cache = {}
     def bpe(s, w):
         if w in s.cache: return s.cache[w]
