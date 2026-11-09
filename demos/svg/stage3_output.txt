@@ -1,0 +1,24 @@
+{"width": 32, "depth": 1, "rows": 32, "prims": 40, "svg_kb": 20, "tight": false, "render_s": 0.15, "exact": "1024/1024"}
+{"width": 32, "depth": 2, "rows": 32, "prims": 76, "svg_kb": 36, "tight": false, "render_s": 0.09, "exact": "1024/1024"}
+{"width": 32, "depth": 3, "rows": 32, "prims": 112, "svg_kb": 53, "tight": false, "render_s": 0.15, "exact": "1024/1024"}
+{"width": 32, "depth": 4, "rows": 32, "prims": 148, "svg_kb": 70, "tight": false, "render_s": 2.8, "exact": "1024/1024"}
+{"width": 32, "depth": 5, "rows": 32, "prims": 184, "svg_kb": 87, "tight": false, "render_s": null, "exact": null, "note": "render failed after 21s: Page.screenshot: Target crashed \nCa"}
+{"width": 64, "depth": 1, "rows": 32, "prims": 72, "svg_kb": 38, "tight": false, "render_s": 0.13, "exact": "2048/2048"}
+{"width": 64, "depth": 2, "rows": 32, "prims": 140, "svg_kb": 72, "tight": false, "render_s": 0.12, "exact": "2048/2048"}
+{"width": 64, "depth": 3, "rows": 32, "prims": 208, "svg_kb": 106, "tight": false, "render_s": 0.86, "exact": "2048/2048"}
+{"width": 64, "depth": 4, "rows": 32, "prims": 276, "svg_kb": 139, "tight": false, "render_s": null, "exact": null, "note": "render failed after 17s: Page.screenshot: Target crashed \nCa"}
+{"width": 128, "depth": 1, "rows": 32, "prims": 136, "svg_kb": 95, "tight": false, "render_s": 0.5, "exact": "4096/4096"}
+{"width": 128, "depth": 2, "rows": 32, "prims": 268, "svg_kb": 182, "tight": false, "render_s": 0.53, "exact": "4096/4096"}
+{"width": 128, "depth": 3, "rows": 32, "prims": 400, "svg_kb": 268, "tight": false, "render_s": 11.17, "exact": "4096/4096"}
+{"width": 32, "depth": 1, "rows": 32, "prims": 42, "svg_kb": 20, "tight": true, "render_s": 0.06, "exact": "1024/1024"}
+{"width": 32, "depth": 2, "rows": 32, "prims": 80, "svg_kb": 37, "tight": true, "render_s": 0.07, "exact": "1024/1024"}
+{"width": 32, "depth": 3, "rows": 32, "prims": 118, "svg_kb": 54, "tight": true, "render_s": 0.16, "exact": "1024/1024"}
+{"width": 32, "depth": 4, "rows": 32, "prims": 156, "svg_kb": 71, "tight": true, "render_s": 2.46, "exact": "1024/1024"}
+{"width": 32, "depth": 5, "rows": 32, "prims": 194, "svg_kb": 88, "tight": true, "render_s": null, "exact": null, "note": "render failed after 15s: Page.screenshot: Target crashed \nCa"}
+{"width": 64, "depth": 1, "rows": 32, "prims": 74, "svg_kb": 39, "tight": true, "render_s": 0.11, "exact": "2048/2048"}
+{"width": 64, "depth": 2, "rows": 32, "prims": 144, "svg_kb": 72, "tight": true, "render_s": 0.17, "exact": "2048/2048"}
+{"width": 64, "depth": 3, "rows": 32, "prims": 214, "svg_kb": 106, "tight": true, "render_s": 0.89, "exact": "2048/2048"}
+{"width": 64, "depth": 4, "rows": 32, "prims": 284, "svg_kb": 140, "tight": true, "render_s": null, "exact": null, "note": "render failed after 15s: Page.screenshot: Target crashed \nCa"}
+{"width": 128, "depth": 1, "rows": 32, "prims": 138, "svg_kb": 95, "tight": true, "render_s": 0.45, "exact": "4096/4096"}
+{"width": 128, "depth": 2, "rows": 32, "prims": 272, "svg_kb": 182, "tight": true, "render_s": 0.47, "exact": "4096/4096"}
+{"width": 128, "depth": 3, "rows": 32, "prims": 406, "svg_kb": 269, "tight": true, "render_s": 20.2, "exact": "4096/4096"}
