@@ -123,5 +123,58 @@ def gif():
     pal[0].save(os.path.join(OUT, "gpt2-generation.gif"), save_all=True, append_images=pal[1:], duration=dur, loop=0, optimize=True, disposal=1)
     print("wrote gpt2-generation.gif", len(frames), "frames", os.path.getsize(os.path.join(OUT, "gpt2-generation.gif")) // 1024, "KB")
 
+
+# ---------- architecture diagrams (hand-laid boxes and arrows; no Mermaid so they render everywhere) ----------
+DCSS = CSS + """.node{fill:var(--node);stroke:var(--grid);stroke-width:1.5} .hl{stroke:var(--c1);stroke-width:2} .arr{stroke:var(--ink2);stroke-width:1.6;fill:none} .dash{stroke:var(--ink2);stroke-width:1.4;fill:none;stroke-dasharray:5 4} .ah{fill:var(--ink2)} .cap{fill:var(--ink2)} .ttl{font-weight:600}
+:root{--node:#f3f2ee}@media (prefers-color-scheme: dark){:root{--node:#262624}}"""
+def flow(name, title, sub, rows, W=860, nh=66, gap=34, hl=(), notes=()):
+    """rows: list of rows; a row is a list of node labels ('\\n' = line break). Arrows run left to right in a row and wrap to the next row.
+       hl: set of (row, col) boxes to outline in the accent color. notes: [(x, y, text)] small captions."""
+    top = 78; rg = 52; H = top + len(rows) * nh + (len(rows) - 1) * rg + 56
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{escape(title)}"><title>{escape(title)}</title><style>{DCSS}</style><rect class="bg" width="{W}" height="{H}" rx="10"/>',
+         f'<text class="ttl" x="24" y="32" font-size="16">{escape(title)}</text><text class="t2" x="24" y="52" font-size="12">{escape(sub)}</text>',
+         '<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>']
+    pos = []
+    for r, row in enumerate(rows):
+        n = len(row); nw = (W - 48 - (n - 1) * gap) / n; y = top + r * (nh + rg); rp = []
+        for c, lab in enumerate(row):
+            x = 24 + c * (nw + gap); rp.append((x, y, nw))
+            o.append(f'<rect class="node{" hl" if (r, c) in hl else ""}" x="{x:.1f}" y="{y}" width="{nw:.1f}" height="{nh}" rx="9"/>')
+            lines = lab.split("\n"); y0 = y + nh / 2 - (len(lines) - 1) * 8 + 4
+            for k, t in enumerate(lines): o.append(f'<text x="{x+nw/2:.1f}" y="{y0+k*16:.1f}" font-size="12.5" text-anchor="middle">{escape(t)}</text>')
+            if c: o.append(f'<line class="arr" x1="{x-gap+2:.1f}" y1="{y+nh/2}" x2="{x-3:.1f}" y2="{y+nh/2}" marker-end="url(#ah)"/>')
+        pos.append(rp)
+    for r in range(len(rows) - 1):
+        x1, y1, w1 = pos[r][-1]; x2, y2, w2 = pos[r + 1][0]; ym = y1 + nh + rg / 2
+        o.append(f'<path class="arr" d="M{x1+w1/2:.1f},{y1+nh} L{x1+w1/2:.1f},{ym} L{x2+w2/2:.1f},{ym} L{x2+w2/2:.1f},{y2-3}" marker-end="url(#ah)"/>')
+    for (x, y, t) in notes: o.append(f'<text class="cap" x="{x}" y="{y}" font-size="12">{escape(t)}</text>')
+    save(name, "".join(o))
+
+def fig_diagrams():
+    flow("arch-fast-version.svg", "The fast version, end to end", "A GitHub Action only does I/O; the extracted engine does the arithmetic.",
+         [["Viewer opens an issue\ngpt2: ...  or  qa: ...", "GitHub issue", "GitHub Action runner\n(only does I/O)"],
+          ["mdrt/GPT2.md or QA.md\nengine + program + tokenizer\nare all Markdown", "extracted engine runs the\nforward pass in numpy\n(reads the weight shards)", "rendered Markdown\n+ typing animation", "issue reply and\nREADME image"]],
+         hl={(1, 1)}, notes=[(24, 78+2*66+52+44, "Weights are Markdown too: gpt2/*.md shards and qa/weights.md.")])
+    flow("arch-qa-transformer.svg", "Inside the QA transformer", "600K parameters, character-level, 4-bit weights. Small enough to live inside a README.",
+         [["tokens\n(86-character\nvocabulary)", "embedding 86x128\n(shared with the\noutput head)", "3 identical\nblocks (below)", "final\nRMSNorm", "tied head\n128 to 86", "argmax:\nthe next\ncharacter"],
+          ["RMSNorm", "linear\n128 to 384\n(q, k, v)", "RoPE on q, k\ncausal attention\n4 heads x 32", "linear\n128 to 128\n+ residual", "RMSNorm\nlinear\n128 to 512", "GELU", "linear\n512 to 128\n+ residual"]],
+         hl={(0, 2)}, notes=[(24, 78+2*66+52+44, "Each block is the row above: attention sub-block (left four) then feed-forward sub-block (right three), each added back to the stream.")])
+    # where the arithmetic can happen: three columns
+    W, H = 860, 300; cols = [("Fast version", ["GitHub Action runner", "numpy engine extracted", "from a Markdown document", "", "real GPT-2 and the QA model"], 0),
+                              ("Pure markup (secondary build)", ["GitHub's MediaWiki renderer:", "{{#expr}} in the page", "WORKS (toy, verified live)", "", "SVG filters in the viewer's browser:", "every op exact in Chrome; the full", "chain does not render yet"], 1),
+                              ("Probed, not shipped", ["XSLT: works, Chrome removes it", "on 2026-11-17", "Liquid in Jekyll: exact but slow", "CSS + fonts: feasible, slowest,", "last resort"], 0)]
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="Where the arithmetic can happen"><title>Where the arithmetic can happen</title><style>{DCSS}</style><rect class="bg" width="{W}" height="{H}" rx="10"/>',
+         '<text class="ttl" x="24" y="32" font-size="16">Where the arithmetic can happen</text><text class="t2" x="24" y="52" font-size="12">Three places we ran a language model, by who does the multiply-accumulates.</text>']
+    cw = (W - 48 - 2 * 20) / 3
+    for i, (head, lines, h) in enumerate(cols):
+        x = 24 + i * (cw + 20)
+        o.append(f'<rect class="node{" hl" if h else ""}" x="{x:.1f}" y="76" width="{cw:.1f}" height="196" rx="10"/><text class="ttl" x="{x+16:.1f}" y="104" font-size="14">{escape(head)}</text>')
+        for k, t in enumerate(lines): o.append(f'<text x="{x+16:.1f}" y="{130+k*21}" font-size="12.5">{escape(t)}</text>')
+    save("arch-where-arithmetic.svg", "".join(o))
+    flow("arch-mediawiki-net.svg", "How the pure-markup net works", "GitHub's own renderer evaluates every expression when the page loads.",
+         [["trained weights\n(small integers)", "gen_mediawiki.py\nunrolls every neuron\ninline", "README.mediawiki\n{{#expr: ...}}\neverywhere"],
+          ["GitHub's renderer\nevaluates every\nexpression at render time", "table: predicted next\ncharacter per input\ncontext, live", "check_live.py compares\nwith a python reference:\n40/40 exact"]],
+         hl={(1, 0)})
+
 if __name__ == "__main__":
-    fig_time(); fig_precision(); fig_coverage(); fig_compress(); gif()
+    fig_time(); fig_precision(); fig_coverage(); fig_compress(); fig_diagrams(); gif()

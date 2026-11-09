@@ -32,62 +32,21 @@ Latest results from the Action (refreshed on every `gpt2:` / `qa:` issue):
 
 ### The fast version, end to end
 
-```mermaid
-flowchart LR
-    V([Viewer]) -- "opens an issue<br/>gpt2: ... or qa: ..." --> I[GitHub issue]
-    I --> A["GitHub Action runner<br/>(only does I/O)"]
-    A -- "writes the issue text into<br/>the document's run block" --> D["mdrt/GPT2.md or mdrt/QA.md<br/>engine + program + tokenizer<br/>are all Markdown"]
-    W[("weights, as Markdown shards<br/>gpt2/*.md, qa/weights.md")] --> D
-    D -- "the extracted engine runs<br/>the forward pass (numpy)" --> R["rendered Markdown<br/>+ typing animation"]
-    R --> I2[issue reply]
-    R --> P[README image]
-```
+![The fast version, end to end: issue, Action, executable Markdown document, engine, reply](docs/img/arch-fast-version.svg)
 
 ### Inside the QA transformer
 
 600K parameters, character-level, 4-bit weights. Small enough that its weights fit inside the profile README (417 KiB, under GitHub's 500 KiB render limit).
 
-```mermaid
-flowchart TB
-    T["tokens (86-character vocabulary)"] --> E["embedding 86x128<br/>(shared with the output head)"]
-    E --> B
-    subgraph B["3 identical blocks"]
-        direction TB
-        N1[RMSNorm] --> QKV["linear 128 to 384<br/>(q, k, v)"] --> RP["RoPE on q and k"] --> AT["causal attention<br/>4 heads x 32"] --> O["linear 128 to 128"] --> R1(("+")) --> N2[RMSNorm] --> UP["linear 128 to 512"] --> G[GELU] --> DN["linear 512 to 128"] --> R2(("+"))
-    end
-    B --> FN[final RMSNorm] --> H["tied head 128 to 86"] --> AM["argmax: the next character"]
-```
+![Inside the QA transformer: embedding, three blocks, tied head, argmax](docs/img/arch-qa-transformer.svg)
 
 ### Where the arithmetic can happen
 
-```mermaid
-flowchart LR
-    subgraph fast["Fast version"]
-        A1["GitHub Action runner<br/>numpy engine from a Markdown document"]
-    end
-    subgraph pure["Pure markup (the secondary build)"]
-        M1["GitHub's MediaWiki renderer<br/>{{#expr}} in the page<br/>WORKS (toy, verified live)"]
-        S1["Viewer's browser rendering an SVG filter graph<br/>every op exact in Chrome; full chain blocked by render cost"]
-    end
-    subgraph probed["Probed, not shipped"]
-        X["XSLT: works, Chrome removes it 2026-11-17"]
-        L["Liquid in a Jekyll build: exact but too slow"]
-        C["CSS + fonts: feasible, slowest, last resort"]
-    end
-    A1 ~~~ M1
-    M1 ~~~ X
-```
+![Where the arithmetic can happen: fast version, pure markup, probed substrates](docs/img/arch-where-arithmetic.svg)
 
 ### How the pure-markup net works
 
-```mermaid
-flowchart LR
-    W["trained weights<br/>(small integers)"] --> G["gen_mediawiki.py<br/>unrolls every neuron inline"]
-    G --> P["README.mediawiki<br/>{{#expr: ...}} everywhere"]
-    P --> R["GitHub's renderer evaluates<br/>every expression at render time"]
-    R --> T["table: predicted next character<br/>per input context, live"]
-    T -.-> V["check_live.py compares to a python reference:<br/>40/40 exact"]
-```
+![How the pure-markup MediaWiki net works](docs/img/arch-mediawiki-net.svg)
 
 ## What we tried
 
@@ -220,7 +179,7 @@ python3 build.py 3 5 0.04 100000 && python3 compose.py
 | `.github/workflows/ask.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:` and `qa:` flow |
 | `graph/` | compiled click-through graphs and their compilers |
 | `trackB/`, `trackC/`, `trackD/` | probe reports and builds: GitHub renderer, five substrates, MediaWiki and SVG-filter work |
-| `docs/` | figure generator and images used in this README |
+| `docs/` | figure and diagram generator (`make_figs.py`) and the images used in this README |
 | `build.py`, `compose.py` | compile and validate the character model |
 
 ## Compiled model (2,622 states)
