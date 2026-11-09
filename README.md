@@ -46,7 +46,7 @@ Limits:
 
 ## 2. GPT-2 small in Markdown
 
-<div align="center"><img src="gpt2/latest.svg?v=0" alt="Typing animation of the latest GPT-2 output" width="640"></div>
+<div align="center"><img src="gpt2/latest.svg?v=446ca8b5" alt="Typing animation of the latest GPT-2 output" width="640"></div>
 
 The animation above is the latest generation, refreshed by the Action each time an issue titled `gpt2: ...` is opened.
 
