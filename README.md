@@ -21,6 +21,12 @@ A GitHub Action runs the matching executable Markdown document (`mdrt/GPT2.md` o
 
 <div align="center"><img src="qa/latest.svg?v=efc70962" alt="Typing animation of the latest QA answer" width="640"></div>
 
+## Completely in GitHub markup: a neural net computed by the renderer
+
+[`trackD/mediawiki/README.mediawiki`](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) is a MediaWiki page that GitHub renders. It holds the weights of a toy neural model (2-character context, 12 ReLU hidden units, 5 output bits) and **every multiply-accumulate, ReLU and decode step is a `{{#expr}}` / `{{#ifeq}}` / `{{#switch}}` that GitHub's own renderer evaluates when it renders the page**: no Action, no JavaScript, no runtime of ours. Each row of the table is the model's predicted next character for one context, computed live.
+
+Verified against a python reference on GitHub's production renderer: 40 of 40 predictions, and all 12 hidden units and 5 logits for the worked example, exactly equal (`trackD/mediawiki/check_live.py`). It is a stunt: trained on only 194 characters (63.6% train exact-match), a 311 KB page for 40 rows, because MediaWiki on GitHub has no variables, templates or loops, so every intermediate value is written out inline. Details and limits: [`trackD/mediawiki/REPORT.md`](trackD/mediawiki/REPORT.md).
+
 ## 4. Compiled link graphs (`graph/`)
 
 Pure Markdown navigation, no Action and no JavaScript: GitHub renders the pages and you click.

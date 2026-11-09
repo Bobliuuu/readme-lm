@@ -49,3 +49,7 @@ MediaWiki stunt, quantified:
 - Float64 only, `^`/exp/sqrt/tanh unavailable, so no softmax/GELU except via piecewise #ifexpr/#switch approximations; #switch needs 12.0-vs-12 normalisation.
 - WikiCloth is a char-by-char Ruby parser; deep nesting will be slow (timeouts unverified).
 - Output is one-shot, non-interactive. Honest conclusion: a stunt demonstrating a toy 4x4 matvec + ReLU at render time is plausible (M1, M2, M4 pass in emulation); anything resembling transformer inference, or any dependence on viewer input, is not.
+
+## Correction (2026-11-08)
+
+WikiCloth 0.8.3's `{{#ifexpr: ...}}` always takes the true branch (Ruby treats 0 as truthy), so the earlier M2 pass was only a true-case check. Use `{{#ifeq:{{#expr:a>b}}|1|then|else}}` for conditionals. Found while building `trackD/mediawiki/`, which was then verified on GitHub's live renderer.

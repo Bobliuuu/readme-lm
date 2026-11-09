@@ -40,3 +40,13 @@ Greedy chain (output of step t fed into step t+1) was not built: the previous ch
 
 ## Verify after publishing
 GitHub renders server-side, so `curl -s https://github.com/<owner>/<repo>/blob/<branch>/README.mediawiki` (or the repo main page for README) contains the computed table. Grep for the live column: no `{{#` in the table (only inside the `<code>` prose), no "Expression error", and compare the "live" and "numpy ref" columns: `python3 check.py` logic applies to the saved HTML (point `out_wikicloth.html` at the curl output and reuse the table parser). Mismatch of live vs ref columns or leftover `{{` text means the production renderer differs.
+
+## Live check on github.com (2026-11-08)
+
+Fetched GitHub's own server-side rendering of the pushed page (`gh api -H 'Accept: application/vnd.github.html+json' repos/Bobliuuu/readme-lm/readme/trackD/mediawiki`, saved as `out_live.html`) and ran the same comparison as `check.py` (`check_live.py`):
+
+- section 1: 40/40 live next-character predictions equal the python-int reference
+- section 2 (input `we`): max |hidden error| 0.0, max |logit error| 0.0, 0 bit mismatches, hidden 12/12 and logits 5/5 exact
+- no `Expression error`, no unevaluated `{{#` outside code spans
+
+So GitHub's production renderer evaluates every `#expr` in the page and produces the same numbers as the numpy reference. Still unverified: the interactive web blob view in a browser (the API render comes from the same renderer), and how GitHub's limits behave if the page grows past about 500 KB.
