@@ -14,16 +14,19 @@
  },
  {
   "id": "puzzle",
-  "onscreen": "The puzzle: who does the arithmetic? GitHub strips <script>, CSS, inline SVG; MathJax cannot define a macro (measured)",
+  "onscreen": "The puzzle: who does the arithmetic? GitHub strips <script> and CSS; MathJax cannot define a macro (measured); but an SVG image renders and its filters run",
   "sents": [
    {
     "cap": "A README is static, so who does the arithmetic?"
    },
    {
-    "cap": "GitHub strips scripts, CSS, and inline SVG."
+    "cap": "GitHub strips scripts and CSS."
    },
    {
     "cap": "Even its MathJax can't define a macro. We measured."
+   },
+   {
+    "cap": "But an SVG image does render, filters and all."
    }
   ]
  },
