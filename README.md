@@ -18,15 +18,17 @@ A README is a static document, so "a language model in a README" has to be answe
 
 ## Try it
 
-- **Ask real GPT-2:** open an issue titled [`gpt2: The meaning of life is`](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) (put your own text after `gpt2:`).
-- **Ask the GitHub model:** open [`qa: what is qwentpu`](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+what+is+qwentpu). It only knows my public repos; anything else gets a refusal.
-- **See a README compute with no Action:** open the [MediaWiki net](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki). Every number in its table is evaluated by GitHub's renderer when you load the page.
+The demos run on the profile repo, so the animation at the top of [github.com/Bobliuuu](https://github.com/Bobliuuu) changes with every answer. Open an issue and replace `example text` in the title with anything you like:
+
+- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.md&title=gpt2%3A+example+text).
+- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.md&title=qa%3A+example+text). Anything off-topic gets a refusal.
+- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
 - **Click through precomputed models:** [GPT-2 graphs](graph/gpt2/README.md), [QA graph](graph/qa/README.md), or the [character model at the bottom of this file](#s-the).
 - **Run the executable document yourself:** `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
 
-Latest results from the Action (refreshed on every `gpt2:` / `qa:` issue):
+The live animation (the profile's `assets/readme-lm.svg`, rewritten by the Action on every issue):
 
-<div align="center"><img src="gpt2/latest.svg?v=10eec239" alt="Typing animation of the latest GPT-2 output" width="640"><br><img src="qa/latest.svg?v=efc70962" alt="Typing animation of the latest QA answer" width="640"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/Bobliuuu/Bobliuuu/main/assets/readme-lm.svg" alt="The profile's animation: the latest answer from the latest issue" width="640"></div>
 
 ## Architecture
 

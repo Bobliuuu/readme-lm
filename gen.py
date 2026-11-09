@@ -34,7 +34,7 @@ def wrap(s, w):
         else: cur = (cur + " " + word) if cur else word
     return lines + ([cur] if cur else [])
 
-def svg(prompt, text, temp, meta, W=64, cw=9.0, lh=24):
+def svg(prompt, text, temp, meta, W=64, cw=9.0, lh=24, label="qa"):
     lines = wrap(text, W); N = sum(len(l) for l in lines)
     CPS = 14; typ = N / CPS; T = typ + 5   # seconds per loop
     H = 100 + lh * len(lines); width = int(W * cw + 56)
@@ -42,7 +42,7 @@ def svg(prompt, text, temp, meta, W=64, cw=9.0, lh=24):
          f'<rect width="{width}" height="{H}" rx="12" fill="#0d1117" stroke="#30363d"/>',
          '<circle cx="24" cy="22" r="6" fill="#ff5f56"/><circle cx="44" cy="22" r="6" fill="#ffbd2e"/><circle cx="64" cy="22" r="6" fill="#27c93f"/>',
          f'<text x="88" y="27" font-size="12" fill="#8b949e">README-LM · {meta}</text>',
-         f'<text x="28" y="62" font-size="13" fill="#58a6ff">ask&gt; {html.escape(prompt)}</text>']
+         f'<text x="28" y="62" font-size="13" fill="#58a6ff">{html.escape(label)}&gt; {html.escape(prompt)}</text>']
     done = 0; xs, ys, kt = [], [], []
     xs.append(28); ys.append(100 - 14); kt.append(0.0)
     for i, ln in enumerate(lines):

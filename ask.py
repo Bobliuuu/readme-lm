@@ -14,5 +14,5 @@ if __name__ == "__main__":
     q = "".join(c for c in q if 32 <= ord(c) < 127)[:140]
     m = qa_infer.load(readme); ans = qa_infer.answer(m, q)
     meta = f"{m['params']//1000}K-param transformer · 4-bit · lives in this README"
-    open(out, "w").write(gen.svg(q, ans, "", meta))
+    open(out, "w").write(gen.svg(q, ans, "", meta, label="qa"))
     print(ans)
