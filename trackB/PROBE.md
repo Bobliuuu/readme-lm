@@ -55,7 +55,7 @@ URL fragment (scroll or highlight only; GitHub highlights `#L10` in file views, 
 
 ## Addendum: stock MathJax capability test (not GitHub's configuration)
 
-Run locally with `mathjax-full` 3.2.2 in node, default settings, TeX packages base + newcommand + configmacros. A live github.com page was not tested (publishing a probe file was blocked), so GitHub's actual MathJax configuration is unverified.
+Run locally with `mathjax-full` 3.2.2 in node, default settings, TeX packages base + newcommand + configmacros. The live github.com result is in the next section and supersedes the stock-MathJax conclusions below.
 
 | TeX feature | Result |
 |---|---|
@@ -65,3 +65,18 @@ Run locally with `mathjax-full` 3.2.2 in node, default settings, TeX packages ba
 | macro-substitution budget | default `maxMacros` = 1000: about 111 expansions pass, about 1,110 fail with "maximum macro substitution count exceeded" |
 
 Consequence: macro rewriting and delimiter pattern matching give a tiny lookup/rewrite engine, but with no arithmetic primitives, no conditionals, and roughly 1,000 substitutions per expression, and with no viewer input (the expression is fixed by the file). At most it can evaluate a very small fixed function of the document's own text. A transformer forward pass (hundreds of thousands to 124M multiply-accumulates per token) does not fit.
+
+
+## Live result on github.com (secret gist with 16 probe lines, page text reported by the user)
+
+GitHub's math renderer is MathJax with a base-TeX-only configuration. On the live page:
+
+| Probe | Rendered as |
+|---|---|
+| `\def\a{7}\a` | the literal tokens `\def \a 7 \a` (not executed) |
+| `\newcommand{\sq}[1]{#1+#1}\sq{9}` and the delimited `\def` macros | error "You can't use 'macro parameter character #' in math mode", raw TeX shown |
+| `\ifx`, `\the\numexpr`, `\count`, `\csname`, `\require`, every expansion-budget macro chain | raw tokens, not executed |
+| `\href{...}{...}` | raw TeX (stripped) |
+| `\frac{1}{2}+\sqrt{9}` | renders normally |
+
+Verdict: GitHub's MathJax can typeset a fixed formula and nothing else. It cannot define macros, so there is no macro-rewriting engine, no arithmetic and no conditionals, and it takes no viewer input. A GitHub-rendered README cannot compute a transformer forward pass, or any function, at view time. The earlier stock-MathJax result (macros and delimiter pattern matching work, about 1,000 substitutions per expression) does not apply to GitHub, which does not load those packages.
