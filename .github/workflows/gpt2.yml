@@ -1,0 +1,44 @@
+name: gpt2
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      prompt: {description: "prompt", required: true}
+permissions:
+  contents: read
+  issues: write
+concurrency: gpt2
+jobs:
+  generate:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.issue.title, 'gpt2:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+      TITLE: ${{ github.event.issue.title }}
+      ISSUE: ${{ github.event.issue.number }}
+      INPUT: ${{ inputs.prompt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install numpy regex
+      - name: run GPT-2 from the Markdown shards
+        run: |
+          if [ "$EVENT" = issues ]; then P="${TITLE#gpt2:}"; else P="$INPUT"; fi
+          P="$(printf '%s' "$P" | tr -d '\r' | sed 's/^ *//; s/ *$//' | cut -c1-400)"
+          case "$P" in *\?) FULL="Question: $P"$'\n'"Answer:" ;; *) FULL="$P" ;; esac
+          python3 gpt2/run.py "$FULL" 80 "${ISSUE:-0}" 0.8 > out.txt
+          # no pings, no markdown breakouts
+          OUT="$(cat out.txt | tr -d '`' | sed 's/@/(at)/g')"
+          { echo "**Prompt:** \`$(printf '%s' "$P" | tr -d '`' | sed 's/@/(at)/g')\`"; echo; echo '````'; printf '%s%s\n' "$FULL" "$OUT" | tr -d '`' | sed 's/@/(at)/g'; echo '````'; echo; echo "GPT-2 small (124M params, int8) run in numpy by a GitHub Action. The weights and tokenizer were read from the Markdown files in [\`gpt2/\`](https://github.com/${GITHUB_REPOSITORY}/tree/main/gpt2). It is a base language model, not a chat assistant: it continues text and can be wrong or odd."; } > comment.md
+      - name: reply and close
+        if: github.event_name == 'issues'
+        run: |
+          gh issue comment "$ISSUE" --body-file comment.md
+          gh issue close "$ISSUE" --reason completed
+      - name: print (manual runs)
+        if: github.event_name != 'issues'
+        run: cat comment.md

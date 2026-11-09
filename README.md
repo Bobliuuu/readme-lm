@@ -1,48 +1,52 @@
 # README-LM
 
-**A tiny transformer that answers questions about my GitHub, and the entire model lives inside a GitHub README.** No server: a GitHub Action reads the weights out of the README text and runs the forward pass in numpy. Live at [github.com/Bobliuuu](https://github.com/Bobliuuu): click a question, submit the prefilled issue, get an answer.
+Language models stored as Markdown. This repo holds three different things, with different limits. The table says where each one's weights live and where its computation happens.
 
-## The model
+| | What | Weights live in | Compute runs in | Try it |
+|---|---|---|---|---|
+| 1. QA model | 600K-param char-level transformer that answers questions about my public repos | inside the README of my profile repo, [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu) (417 KiB total, under GitHub's 500 KiB render limit) | a GitHub Action in the profile repo, numpy | open an issue titled `ask: <question>` on the profile repo |
+| 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo, numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
+| 3. Clickable model | char-level MLP (3-character context, 92K params) compiled into 2,622 Markdown states | this README, as links | nowhere: no Action, no JavaScript, you click | [start here](#s-the) |
 
-- 600K-parameter character-level transformer: 3 layers, d=128, 4 heads, RoPE, RMSNorm, tied embeddings.
-- **4-bit group-quantized weights** (quantization-aware training, group size 32), zlib-compressed and base64-encoded: ~417 KB, so the whole README is ~417 KiB and fits GitHub's 500 KiB rendering limit.
-- Trained on ~700 question/answer facts written from my public repos' READMEs (plus off-topic refusals), 110 epochs, memorization-heavy on purpose.
-- Questions outside my GitHub get a refusal; it has no general knowledge.
+## 1. QA model inside a README
 
-## Honest limits
+- Architecture: 3 layers, d=128, 4 heads, RoPE, RMSNorm, tied embeddings, character-level, about 600K parameters.
+- Weights: 4-bit group-quantized (quantization-aware training, group size 32), zlib-compressed and base64-encoded, embedded in the profile repo's README. Together with the README text the file is 417 KiB, under GitHub's 500 KiB render limit.
+- How it runs: a GitHub Action in the profile repo reads the weights out of its own README.md, runs numpy inference (`qa_infer.py`, `ask.py`), answers issues titled `ask: <question>`, replies, closes the issue, and refreshes an animated typing SVG.
+- Training data: about 690 question/answer facts written by agents from my public READMEs, plus curated facts and about 380 off-topic refusals (`qa/*.jsonl`). Training is 110 epochs and mostly memorization.
 
-It is a small, mostly-memorizing model: exact or near-exact questions about my repos are answered correctly; unusual phrasings can produce a wrong or garbled answer. Size is the constraint, not the idea: more facts need more parameters than fit in 500 KiB.
+Limits:
 
-## Files
+- It is mostly a lookup table in weights. Near-exact phrasings of trained questions work; unusual phrasings can fail or produce garbled text. In a holdout experiment on held-out phrasings, character-4gram F1 was about 0.5.
+- The facts were written by agents and were not independently verified against the READMEs, so some may be wrong.
+- Questions outside my GitHub get a refusal. It has no general knowledge.
+- More facts need more parameters than fit in 500 KiB.
 
-| File | Purpose |
-|---|---|
-| `qa_model.py` | transformer + 4-bit fake-quant (QAT) |
-| `build_qa.py`, `qa/*.jsonl` | dataset: facts, phrasings, refusals |
-| `train_qa.py` | training (`python3 train_qa.py 110 0.0 final`) |
-| `export_qa.py` | pack int4 weights into a README between markers |
-| `qa_infer.py`, `ask.py`, `gen.py` | numpy inference (KV cache), animated SVG |
+## 2. GPT-2 small in Markdown
 
-## Clickable variant
+GPT-2 small does not fit in one README: 124M parameters is far more than 500 KiB. So the weights are sharded across Markdown files in this repo, and the computation happens in a GitHub Action runner, not in the README and not in your browser.
 
-An earlier experiment compiles a smaller char-level model into pure Markdown links (no Action at all); that version is below.
+- `gpt2/weights/part-*.md`: 339 files, each a fenced block of base64(zlib(int8)), about 112 MB in total.
+- `gpt2/tokenizer/part-*.md`: the BPE vocabulary and merges, same encoding.
+- `gpt2/manifest.md`: the tensor table (names, shapes, quantization layout).
+- `gpt2/run.py`: a numpy-only GPT-2 forward pass with a KV cache and a pure-Python byte-level BPE (needs `numpy` and `regex`). It reads the shards directly. On a laptop CPU, loading takes about 3 s and generation about 0.25 s per token.
+- Quantization: int8 per output channel. On a 44-token test passage, perplexity was 13.5 (int8) versus 13.4 (fp32), and top-1 next-token agreement was 38/44. That is a small test, not a benchmark.
+- Workflow `.github/workflows/gpt2.yml` answers issues titled `gpt2: <anything>`. If the title ends in `?` it is turned into `Question: ... Answer:`. The Action replies with the output and closes the issue. The issue template `.github/ISSUE_TEMPLATE/gpt2.md` opens the form. A click-link looks like `https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is`.
 
----
+Limits: GPT-2 is a base language model, not a chat assistant. It continues text, and the output can be wrong, repetitive or odd. Each reply takes however long an Action run takes.
 
-**A real neural network, running inside a GitHub README. No JavaScript, no server, no API. Inference is you clicking links.**
+Inspiration: Shubham Patil's [GPT-2 in pure CSS](https://gpt2css.shubhampatil.dev) ([blog post](https://shubhampatil.dev/blog/gpt2-css)), which does the computation in the browser. This project differs: the weights are stored as Markdown and the computation happens in a GitHub Action.
 
-A tiny character-level neural language model (MLP, 3-character context, 92K parameters, trained in PyTorch on the READMEs of my public repos) is **compiled into pure Markdown**. Every possible 3-character context is a state. For each state the compiler runs the network's forward pass ahead of time and writes its top next-character predictions as links, with probabilities, pointing at the next state.
+## 3. Clickable compiled model
 
-## Play
+A character-level MLP (27 chars, 3-character context, 92K parameters, trained on public README text) is compiled ahead of time into 2,622 Markdown states. Each state is one line with an anchor and links to its top next-character predictions with probabilities. There is no Action and no JavaScript; you click through the links and keep track of the text yourself. Every link is validated by `compose.py`.
 
-Start at [`t` `h` `e`](#s-the). Pick a next character (probability shown), and you jump to the next state. **You** keep track of the text you've picked; GitHub does the arithmetic ahead of time and never accumulates anything.
+Start at [`t` `h` `e`](#s-the). The compiled states are at the end of this file.
 
-Greedy path from the start state: *the start status and the seeds a sized to the s...* (sampled by the same links, validated: 0 broken).
-
-## How it works
+How it was built:
 
 1. `build.py` trains the MLP (`27 chars -> 24-d embeddings x 3 -> 256 -> 256 -> 27`) and runs BFS from the start state over the network's top-5 predictions (probability >= 4%).
-2. Each reachable context becomes one line: an anchor `<a name="s-abc">` plus one link per prediction (character, probability, target state).
+2. Each reachable context becomes one line: an anchor plus one link per prediction (character, probability, target state).
 3. `compose.py` checks that every link resolves to an existing anchor.
 
 ## How much neural inference fits in a README?
@@ -59,15 +63,38 @@ GitHub stops rendering a README at 500 KiB. Measured on this model, same trainin
 
 States grow as 27^k, links per state stay fixed, so a finite-context neural LM hits the 500 KiB wall at k=4. A real transformer, with an unbounded sliding-window state, can't be compiled this way. Only a quantized, tiny-context one could.
 
+
 ## Reproduce
 
 ```
-pip install torch
-python3 build.py 3 5 0.04 100000   # train + compile k=3
-python3 compose.py                 # link validation + render
+pip install torch numpy regex
+
+# 1. QA model (train, then pack int4 weights into a README between markers)
+python3 build_qa.py
+python3 train_qa.py 110 0.0 final      # epochs, holdout fraction, tag
+python3 export_qa.py qa_final.pt README.md
+python3 ask.py README.md out.svg 0 "what is qwentpu"
+
+# 2. GPT-2 from the Markdown shards (numpy + regex only)
+python3 gpt2/run.py "The meaning of life is" 60
+
+# 3. Clickable model
+python3 build.py 3 5 0.04 100000       # train + compile k=3
+python3 compose.py                     # link validation + render
 ```
 
----
+## File map
+
+| Path | Purpose |
+|---|---|
+| `qa_model.py` | QA transformer + 4-bit fake-quant (QAT) |
+| `build_qa.py`, `qa/*.jsonl` | QA dataset: facts, phrasings, refusals |
+| `train_qa.py` | QA training |
+| `export_qa.py` | pack int4 weights into a README between markers |
+| `qa_infer.py`, `ask.py`, `gen.py` | numpy inference with KV cache; answer and animated SVG |
+| `gpt2/` | GPT-2 shards (`weights/`, `tokenizer/`), `manifest.md`, `run.py`, `convert.py` |
+| `.github/workflows/gpt2.yml`, `.github/ISSUE_TEMPLATE/gpt2.md` | the `gpt2:` issue workflow and form |
+| `build.py`, `compose.py` | compile and validate the clickable model |
 
 ## Compiled model (2,622 states)
 
