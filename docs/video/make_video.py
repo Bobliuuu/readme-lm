@@ -49,6 +49,9 @@ gif = sorted(os.listdir(f"{tmp}/gif"))
 # work dir for the page: scenes + assets side by side
 page = f"{tmp}/page"; os.makedirs(page)
 for f in ("scenes.html", "scenes.css", "scenes.js"): shutil.copy(os.path.join(HERE, f), page)
+LF = ["02","03","04","05","09","12","13","14","15","16"]
+os.makedirs(f"{page}/live")
+for f in LF: shutil.copy(os.path.join(ROOT, "docs", "gifs", "issue-flow-frames", f + ".jpg"), f"{page}/live/{f}.jpg")
 shutil.copy(f"{tmp}/latest.png", page); shutil.copytree(f"{tmp}/gif", f"{page}/gif")
 
 # 4. frame-by-frame render
@@ -58,7 +61,7 @@ with sync_playwright() as pw:
     br = pw.chromium.launch(channel="chrome", headless=True, args=["--hide-scrollbars"])
     pg = br.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1).new_page()
     pg.goto("file://" + page + "/scenes.html"); pg.wait_for_load_state("load")
-    pg.evaluate("async c=>await init(c)", dict(scenes=scenes, gifFrames=["gif/" + g for g in gif]))
+    pg.evaluate("async c=>await init(c)", dict(scenes=scenes, gifFrames=["gif/" + g for g in gif], liveFrames=["live/" + f + ".jpg" for f in LF]))
     if A.shots:
         os.makedirs(os.path.join(HERE, "_shots"), exist_ok=True)
         for spec in A.shots.split(","):
@@ -78,7 +81,7 @@ with sync_playwright() as pw:
     pg.screenshot(path=os.path.join(HERE, "poster.png"), type="png"); br.close()
 
 # 5. preview gif: highlights (scene id, sentence index, offset s, length s)
-HL = [("title", 0, 0.5, 1.6), ("puzzle", 1, 0.2, 2.2), ("three", 0, 0.4, 2.0), ("a", 3, 0.2, 2.6), ("b", 1, 0.3, 2.0), ("c", 4, 0.4, 1.8), ("tried", 2, 1.2, 1.6), ("outro", 0, 0.3, 1.2)]
+HL = [("title", 0, 0.5, 1.6), ("puzzle", 1, 0.2, 2.2), ("three", 0, 0.4, 2.0), ("a", 3, 0.2, 2.6), ("b", 1, 0.3, 2.0), ("c", 4, 0.4, 1.8), ("live", 1, 0.3, 2.0), ("tried", 2, 1.2, 1.6), ("outro", 0, 0.3, 1.2)]
 sc = {s["id"]: s for s in scenes}; parts = []
 for k, (sid, si, off, ln) in enumerate(HL):
     s0 = sc[sid]["start"] + sc[sid]["st"][si] + off; parts.append(f"[0:v]trim=start={s0:.3f}:duration={ln},setpts=PTS-STARTPTS[v{k}]")

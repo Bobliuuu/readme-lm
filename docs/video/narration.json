@@ -108,6 +108,19 @@
   ]
  },
  {
+  "id": "live",
+  "onscreen": "Live demo, real recording of issue #12 (qa: what is jerry building): click the README link, the form opens prefilled, Create; about 35 s later the Action has answered and closed the issue; after GitHub's image cache refreshes (about 6.5 min here) the profile animation shows the new answer. Elapsed-seconds counter from real screenshot timestamps",
+  "sents": [
+   {
+    "cap": "Here is the real thing: click the link, the form opens prefilled, and submit."
+   },
+   {
+    "cap": "About thirty-five seconds later the Action has answered. The profile animation follows once GitHub's image cache refreshes.",
+    "tts": "About thirty-five seconds later the Action has answered. The profile animation follows once GitHub's image cache refreshes."
+   }
+  ]
+ },
+ {
   "id": "tried",
   "onscreen": "What we tried: numpy engine 0.2 s; XSLT in Chrome 163 s (Chrome removes XSLT 2026-11-17); Liquid in Jekyll 17-22 min (exact); CSS + fonts 11-65 min (extrapolated). Precision: 8-bit activations are the crux: 87.5% without retraining, 100% retrained",
   "sents": [
