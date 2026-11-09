@@ -1,0 +1,1 @@
+{%- if include.n > 0 -%}{%- assign nn = include.n | minus: 1 -%}{%- include rec.html n=nn -%}{%- assign rec_out = rec_out | plus: include.n -%}{%- else -%}{%- assign rec_out = 0 -%}{%- endif -%}

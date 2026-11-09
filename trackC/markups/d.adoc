@@ -1,0 +1,12 @@
+:n: 3
+ifeval::[{n} - 1 == 2]
+SUB-OK
+endif::[]
+ifeval::[{counter:q} + {counter:q} == 3]
+COUNTER-IN-EVAL
+endif::[]
+:m: {n}
+ifeval::["{m}" == "3"]
+STR-OK
+endif::[]
+{counter:z:10}{counter:z}{counter:z}

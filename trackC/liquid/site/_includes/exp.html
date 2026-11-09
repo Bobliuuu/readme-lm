@@ -1,0 +1,9 @@
+{%- comment -%} exp(x) for include.x ; result in exp_out. Range reduction x = k ln2 + r, Taylor deg include.deg, then scale by 2^k {%- endcomment -%}
+{%- assign xx = include.x | at_least: -80.0 | at_most: 80.0 -%}
+{%- assign k = xx | times: 1.4426950408889634 | round -%}
+{%- assign r = k | times: 0.6931471805599453 | times: -1.0 | plus: xx -%}
+{%- assign tm = 1.0 -%}{%- assign sm = 1.0 -%}
+{%- for n in (1..include.deg) -%}{%- assign tm = tm | times: r | divided_by: n -%}{%- assign sm = sm | plus: tm -%}{%- endfor -%}
+{%- if k < 0 -%}{%- assign ak = 0 | minus: k -%}{%- for n in (1..ak) -%}{%- assign sm = sm | divided_by: 2.0 -%}{%- endfor -%}
+{%- elsif k > 0 -%}{%- for n in (1..k) -%}{%- assign sm = sm | times: 2.0 -%}{%- endfor -%}{%- endif -%}
+{%- assign exp_out = sm -%}

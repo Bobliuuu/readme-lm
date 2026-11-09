@@ -1,0 +1,30 @@
+<!doctype html><meta charset=utf-8><style>
+@font-face{font-family:f1;src:url(f1.ttf)} @font-face{font-family:f2;src:url(f2.ttf)}
+@property --p0{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd0{from{--p0:0}to{--p0:1}}
+@property --p1{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd1{from{--p1:0}to{--p1:1}}
+@property --p2{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd2{from{--p2:0}to{--p2:1}}
+@property --p3{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd3{from{--p3:0}to{--p3:1}}
+@property --p4{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd4{from{--p4:0}to{--p4:1}}
+@property --p5{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd5{from{--p5:0}to{--p5:1}}
+@property --p6{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd6{from{--p6:0}to{--p6:1}}
+@property --p7{syntax:'<number>';inherits:true;initial-value:0}
+@keyframes rd7{from{--p7:0}to{--p7:1}}
+
+html,body{margin:0;background:#fff}
+body{timeline-scope:--t0, --t1, --t2, --t3, --t4, --t5, --t6, --t7}
+#sc{overflow-x:scroll;overflow-y:hidden;width:2400px;height:100px;scrollbar-width:none;position:relative}
+.row{height:10px;white-space:nowrap;font-size:0}
+.row .A{display:inline-block;font-family:f1;font-size:1000px;line-height:0;height:0;font-variation-settings:"a000" -0.5, "a001" 0.5, "a002" -0.75, "a003" -0.375;vertical-align:top}
+.row .M{display:inline-block;width:1px;height:10px;vertical-align:top}
+#cons{animation-name:rd0, rd1, rd2, rd3, rd4, rd5, rd6, rd7;animation-duration:1s;animation-timing-function:linear;animation-fill-mode:both;animation-timeline:--t0, --t1, --t2, --t3, --t4, --t5, --t6, --t7;
+ --h0:calc((2401 * (1 - var(--p0)) - 1100) / 2); --a0:clamp(0, max(0, var(--h0)) / 64, 1);--h1:calc((2401 * (1 - var(--p1)) - 1100) / 2); --a1:clamp(0, max(0, var(--h1)) / 64, 1);--h2:calc((2401 * (1 - var(--p2)) - 1100) / 2); --a2:clamp(0, max(0, var(--h2)) / 64, 1);--h3:calc((2401 * (1 - var(--p3)) - 1100) / 2); --a3:clamp(0, max(0, var(--h3)) / 64, 1);--h4:calc((2401 * (1 - var(--p4)) - 1100) / 2); --a4:clamp(0, max(0, var(--h4)) / 64, 1);--h5:calc((2401 * (1 - var(--p5)) - 1100) / 2); --a5:clamp(0, max(0, var(--h5)) / 64, 1);--h6:calc((2401 * (1 - var(--p6)) - 1100) / 2); --a6:clamp(0, max(0, var(--h6)) / 64, 1);--h7:calc((2401 * (1 - var(--p7)) - 1100) / 2); --a7:clamp(0, max(0, var(--h7)) / 64, 1);
+ --fv:"a000" var(--a0), "a001" var(--a1), "a002" var(--a2), "a003" var(--a3), "a004" var(--a4), "a005" var(--a5), "a006" var(--a6), "a007" var(--a7)}
+.o{font-family:f2;font-size:1000px;line-height:1;height:6px;overflow:hidden;width:max-content;background:#f00;margin-bottom:4px;font-variation-settings:var(--fv)}
+</style><div id=sc><div class=row><span class=A>A</span><span class=M style="view-timeline:--t0 x;background:#00f"></span></div><div class=row><span class=A>B</span><span class=M style="view-timeline:--t1 x;background:#00f"></span></div><div class=row><span class=A>C</span><span class=M style="view-timeline:--t2 x;background:#00f"></span></div><div class=row><span class=A>D</span><span class=M style="view-timeline:--t3 x;background:#00f"></span></div><div class=row><span class=A>E</span><span class=M style="view-timeline:--t4 x;background:#00f"></span></div><div class=row><span class=A>F</span><span class=M style="view-timeline:--t5 x;background:#00f"></span></div><div class=row><span class=A>G</span><span class=M style="view-timeline:--t6 x;background:#00f"></span></div><div class=row><span class=A>H</span><span class=M style="view-timeline:--t7 x;background:#00f"></span></div></div><div id=cons><div class=o>A</div><div class=o>B</div><div class=o>C</div><div class=o>D</div></div>

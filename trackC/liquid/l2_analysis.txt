@@ -1,0 +1,9 @@
+ReLU exact: True 17
+exp deg6: x in [-30,10] max rel err 1.46e-07
+exp deg8: x in [-30,10] max rel err 2.39e-10
+exp deg10: x in [-30,10] max rel err 2.55e-13
+rsqrt iters4: v in [0.05,4] max rel err rsqrt 4.77e-01 sqrt 4.77e-01
+rsqrt iters6: v in [0.05,4] max rel err rsqrt 1.12e-01 sqrt 1.12e-01
+rsqrt iters8: v in [0.05,4] max rel err rsqrt 4.89e-04 sqrt 4.89e-04
+rsqrt iters10: v in [0.05,4] max rel err rsqrt 1.93e-13 sqrt 1.93e-13
+softmax max abs err 3.885780586188048e-15

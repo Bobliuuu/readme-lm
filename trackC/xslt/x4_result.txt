@@ -1,0 +1,7 @@
+case0 q='what is qwentpu' forced=''(0ch) ntok=22 xslt_argmax=17(q) numpy_argmax=17(q) max|dlogit|=8.91e-08 wall=28s(parallel) PASS
+case1 q='what is qwentpu' forced='qwentpu is a TPU compiled'(25ch) ntok=47 xslt_argmax=0( ) numpy_argmax=0( ) max|dlogit|=1.10e-07 wall=53s(parallel) PASS
+case2 q='who are you' forced=''(0ch) ntok=18 xslt_argmax=34(H) numpy_argmax=34(H) max|dlogit|=8.70e-08 wall=53s(parallel) PASS
+case3 q='What is a TPU?' forced='a T'(3ch) ntok=24 xslt_argmax=8(h) numpy_argmax=8(h) max|dlogit|=9.79e-08 wall=53s(parallel) PASS
+case4 q='does it need training' forced='no TPU hardware and no tra'(26ch) ntok=54 xslt_argmax=3(c) numpy_argmax=3(c) max|dlogit|=8.11e-08 wall=59s(parallel) PASS
+case5 q='what is qwentpu' forced='qwentpu is a TPU compiled into'(100ch) ntok=122 xslt_argmax=0( ) numpy_argmax=0( ) max|dlogit|=9.67e-08 wall=154s(parallel) PASS
+X4 PASS

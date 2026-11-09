@@ -1,0 +1,2 @@
+ARGMAX 17
+ANSWER qwentpu is a TPU compiled into the weights of a stock Qwen3.5 (0.8B, 2B or 4B), with no TPU hardware and no training.

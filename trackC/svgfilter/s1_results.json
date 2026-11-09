@@ -1,0 +1,26 @@
+{
+ "sRGB/direct": {
+  "prod_maxerr": 0.0,
+  "prod_exact": 1.0,
+  "sum_maxerr": 1.0,
+  "sum_exact": 0.9288002847988608
+ },
+ "sRGB/img": {
+  "prod_maxerr": 0.0,
+  "prod_exact": 1.0,
+  "sum_maxerr": 1.0,
+  "sum_exact": 0.9288002847988608
+ },
+ "linearRGB/direct": {
+  "prod_maxerr": 14.0,
+  "prod_exact": 0.2292630829476682,
+  "sum_maxerr": 60.0,
+  "sum_exact": 0.11391954432182272
+ },
+ "linearRGB/img": {
+  "prod_maxerr": 14.0,
+  "prod_exact": 0.2292630829476682,
+  "sum_maxerr": 60.0,
+  "sum_exact": 0.11391954432182272
+ }
+}

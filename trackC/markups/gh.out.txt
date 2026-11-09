@@ -1,0 +1,14 @@
+
+<p>12.0 / T / 70.0</p>
+<div class="paragraph">
+<p></p>
+</div>
+<div class="paragraph">
+<p>M1 s=12</p>
+</div>
+<div class="paragraph">
+<p>A-GT-B</p>
+</div>
+<div class="paragraph">
+<p><a href="c.txt" class="bare include">c.txt</a></p>
+</div>

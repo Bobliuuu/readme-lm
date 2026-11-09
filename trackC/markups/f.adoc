@@ -1,0 +1,11 @@
+{counter2:x:3}{counter2:y:3}
+:x3: {x}
+ifeval::[{x} == {y}]
+EQ-ATTRS
+endif::[]
+ifeval::[{x} + 1 == 4]
+ARITH
+endif::[]
+ifeval::[{x} == 3]
+X3
+endif::[]

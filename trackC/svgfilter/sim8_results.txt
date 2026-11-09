@@ -1,0 +1,8 @@
+fp ref vs training answers char-prefix match: 0.6181955228844268
+sim noise 0 bits 8 exact-string match vs fp4w ref 0.875 mean first-len char match 0.908
+sim noise 0 bits 10 exact-string match vs fp4w ref 0.95 mean first-len char match 0.972
+sim noise 0 bits 12 exact-string match vs fp4w ref 0.95 mean first-len char match 0.981
+sim noise 0 bits 16 exact-string match vs fp4w ref 0.975 mean first-len char match 0.993
+sim noise 1.5 bits 8 exact-string match vs fp4w ref 0.8 mean first-len char match 0.844
+What is README-LM? -> README-LM is a tiny 4-bit transformer whose weights are stored inside 
+how can blockmind-ai be deployed -> The blockmind-ai README says it can be deployed with guides for Vercel

@@ -1,0 +1,8 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title></head>
+<body><xslt-warning-banner style="background-color: #d9534f; color: white; padding: 12px 44px; font-size: 16px; font-weight: bold; text-align: center; font-family: sans-serif; line-height: normal; bottom: auto; width: auto; border: none;" popover="manual"></xslt-warning-banner>
+<pre>ARGMAX 17
+ANSWER qwentpu is a TPU compiled into the weights of a stock Qwen3.5 (0.8B, 2B or 4B), with no TPU hardware and no training.</pre>
+</body>
+</html>

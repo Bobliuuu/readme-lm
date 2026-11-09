@@ -1,0 +1,23 @@
+:a: 7
+:b: 5
+sum-attr: {a}+{b}
+counter1: {counter:n} {counter:n} {counter:n}
+set: {set:x:hello}x={x}
+ifeval::[{a} + {b} == 12]
+IFEVAL-ARITH-TRUE
+endif::[]
+ifeval::[{a} * {b} > 30]
+IFEVAL-MUL-TRUE
+endif::[]
+ifeval::[{a} > 3]
+GT3
+endif::[]
+ifdef::a[]
+IFDEF-A
+endif::[]
+ifndef::zz[]
+IFNDEF-ZZ
+endif::[]
+include::a.adoc[]
+pass: pass:[<b>x</b>] +++<i>raw</i>+++
+sub: {counter:k:1} {counter:k} {counter:k}

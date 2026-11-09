@@ -1,0 +1,4 @@
+toy 2-layer net d=128 vocab=16, start token 3, 24 greedy steps in one xsltproc run
+xslt =[3, 11, 11, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+numpy=[3, 11, 11, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+PASS
