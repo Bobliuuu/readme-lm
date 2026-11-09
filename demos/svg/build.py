@@ -18,23 +18,26 @@ def layout_q8(CTX, H):
     L["W"] = L["HB"] + max(L["n1"], H) + 8
     return L
 
+def compute_q8(c, M, L, oh):
+    """the network itself. oh: (rows, ctx*32) uint8 one-hot input pixels (code 1) = the only input data. Returns (hidden codes, argmax id, logits, preact) images."""
+    W1, b1, W2, b2 = M["W1"].astype(np.int64), M["b1"].astype(np.int64), M["W2"].astype(np.int64), M["b2"].astype(np.int64)
+    d1, d2, lut = int(M["d1"]), int(M["d2"]), M["lut"].astype(np.int64); CTX, H = W1.shape[0], W1.shape[2]; rows = c.rows; CB = L["CB"]
+    x = c.merge([c.image(oh, x=CB, y=0)])
+    E1 = W1.transpose(2, 0, 1).reshape(H, CTX * V)
+    p = linear(c, x, CB, L["n1"], E1, d1, 0, 128, b1, list(range(L["HB"], L["HB"] + H)))       # one convolve per hidden neuron, 8-bit code zp 128
+    hid = c.merge([c.lut(p, lut, x=L["HB"], y=0, w=H, h=rows)])                                  # ReLU + requantise (feComponentTransfer)
+    lg = linear(c, hid, L["HB"], H, W2, d2, 0, 128, b2, list(range(V)))                          # one convolve per logit; codes at cols 0..31
+    idn = argmax_row(c, lg, V)                                                                   # predicted id at col 31
+    return hid, idn, lg, p
+
 def build_q8(M, ctxids, actual, RH=24, debug=False, disp=True, only=None):
     W1, b1, W2, b2 = M["W1"].astype(np.int64), M["b1"].astype(np.int64), M["W2"].astype(np.int64), M["b2"].astype(np.int64)
     d1, d2, lut = int(M["d1"]), int(M["d2"]), M["lut"].astype(np.int64); CTX, H = W1.shape[0], W1.shape[2]
     N = len(ctxids); L = layout_q8(CTX, H); rows = N * RH; c = Ctx(L["W"], rows); CB = L["CB"]
-    # ---- input data: one-hot pixels (code 1) per window row (the only thing the Action writes)
     oh = np.zeros((rows, L["n1"]), np.uint8)
     for r in range(N):
         for k in range(CTX): oh[r * RH:(r + 1) * RH, k * V + ctxids[r][k]] = 1
-    x = c.merge([c.image(oh, x=CB, y=0)])
-    # ---- layer 1: one convolve per hidden neuron over the 128 one-hot pixels (+guard); round/clamp to an 8-bit code, zero point 128
-    E1 = W1.transpose(2, 0, 1).reshape(H, CTX * V)
-    p = linear(c, x, CB, L["n1"], E1, d1, 0, 128, b1, list(range(L["HB"], L["HB"] + H)))
-    # ---- ReLU / requantise LUT (feComponentTransfer, 256 entries)
-    hid = c.merge([c.lut(p, lut, x=L["HB"], y=0, w=H, h=rows)])
-    # ---- layer 2: one convolve per logit over the 64 hidden codes; logit codes land at cols 0..31
-    lg = linear(c, hid, L["HB"], H, W2, d2, 0, 128, b2, list(range(V)))
-    idn = argmax_row(c, lg, V)                              # predicted id at col 31
+    hid, idn, lg, p = compute_q8(c, M, L, oh)
     parts = display(c, L, N, RH, ctxids, actual, hid, idn, L["HB"], H, V - 1, cw=L["CW"], only=only, gain=HEAT_GAIN_Q8) if disp else []
     if debug: parts += {'lg': [hid, lg], 'id': [hid, idn], 'p': [p]}[debug]; c.dbg_p_col = None
     c.merge(parts or [idn])

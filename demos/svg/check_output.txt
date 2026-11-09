@@ -1,39 +1,45 @@
-{"input": "'</svg><script>alert(1)</script>'", "sanitized": "svg script alert script", "windows": 24, "bytes": 214864, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'\"><image href=x onerror=alert(1)>'", "sanitized": "image href x onerror alert", "windows": 27, "bytes": 215904, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'&lt;svg onload=alert(1)&gt;'", "sanitized": "lt svg onload alert gt", "windows": 23, "bytes": 214516, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'{{x}}'", "sanitized": "x", "windows": 2, "bytes": 206474, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'<img src=//evil.example/x.png>'", "sanitized": "img src evil.example x.png", "windows": 27, "bytes": 215932, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'javascript:alert(1)'", "sanitized": "javascript alert", "windows": 17, "bytes": 212400, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "\"'; DROP TABLE x;--\"", "sanitized": "' drop table x --", "windows": 18, "bytes": 212732, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'\\x00\\x1f\\u202e rtl \ud83d\ude00 \u00e9\u00e8 NFKD'", "sanitized": "rtl ee nfkd", "windows": 12, "bytes": 210604, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'<![CDATA[ ]]> <!-- --> ]]>'", "sanitized": "cdata -- --", "windows": 12, "bytes": 210588, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'  \\n\\t multiple   spaces\\r\\nand newline", "sanitized": "multiple spaces and newlines", "windows": 29, "bytes": 216632, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "''", "sanitized": "", "windows": 1, "bytes": 206125, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-{"input": "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "sanitized": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "windows": 97, "bytes": 238607, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
-safety: PASS | cli: {'input': 'the quick brown fox', 'windows': 20, 'bytes': 213452}
+{"input": "'</svg><script>alert(1)</script>'", "sanitized": "svg script alert script", "windows": 12, "bytes": 473895, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'\"><image href=x onerror=alert(1)>'", "sanitized": "image href x onerror alert", "windows": 12, "bytes": 473907, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'&lt;svg onload=alert(1)&gt;'", "sanitized": "lt svg onload alert gt", "windows": 12, "bytes": 473887, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'{{x}}'", "sanitized": "x", "windows": 2, "bytes": 465633, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'<img src=//evil.example/x.png>'", "sanitized": "img src evil.example x.png", "windows": 12, "bytes": 473951, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'javascript:alert(1)'", "sanitized": "javascript alert", "windows": 12, "bytes": 473811, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "\"'; DROP TABLE x;--\"", "sanitized": "' drop table x --", "windows": 12, "bytes": 473807, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'\\x00\\x1f\\u202e rtl \ud83d\ude00 \u00e9\u00e8 NFKD'", "sanitized": "rtl ee nfkd", "windows": 12, "bytes": 473675, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'<![CDATA[ ]]> <!-- --> ]]>'", "sanitized": "cdata -- --", "windows": 12, "bytes": 473663, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'  \\n\\t multiple   spaces\\r\\nand newline", "sanitized": "multiple spaces and newlines", "windows": 12, "bytes": 473983, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "''", "sanitized": "", "windows": 1, "bytes": 464629, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+{"input": "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "sanitized": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "windows": 12, "bytes": 476036, "forbidden": [], "charset_ok": true, "input_in_text_nodes": false}
+safety: PASS | cli: {'input': 'the quick brown fox', 'windows': 12, 'bytes': 473831}
   hidden relu(W1 x+b1) exact: 12288/12288
-  render_s[hid] (1024 rows): 0.11
+  render_s[hid] (1024 rows): 0.06
   logit codes clamp(z,0,255) exact: 5120/5120
   logit sign (z>0) exact: 5120/5120
-  render_s[z] (1024 rows): 0.09
+  render_s[z] (1024 rows): 0.07
   bits exact: 5120/5120
-  render_s[bits] (1024 rows): 0.07
+  render_s[bits] (1024 rows): 0.06
   decoded char id exact: 1024/1024
-  render_s[id] (1024 rows): 0.06
+  render_s[id] (1024 rows): 0.1
   picture: heat cells exact: 12288/12288
   picture: predicted glyph exact: 1024/1024
   picture: context/actual glyphs: 3072/3072
-  picture render_s per 64 windows (max): 0.29
+  picture render_s per 64 windows (max): 0.26
   MediaWiki rows (WikiCloth live == numpy col): 40/40
   SVG glyph pred == WikiCloth live pred (rows of README.mediawiki): 40/40
   SVG glyph pred == numpy ref char (all 1024 ctx, from pixels): 1024/1024
 stage1: PASS
-{"text": "the quick brown fox", "windows": 20, "bytes": 213452, "prims": 597, "render_s": 2.3, "heat": "2560/2560", "pred_glyph": "20/20", "ctx_actual_glyph": "120/120", "hidden_codes": "2560/2560", "argmax_id": "20/20", "logit_codes": "640/640", "pred_text": "whe awicksteowsearr ", "all_exact": true}
-{"text": "what is qwentpu?", "windows": 17, "bytes": 212404, "prims": 597, "render_s": 2.0, "heat": "2176/2176", "pred_glyph": "17/17", "ctx_actual_glyph": "102/102", "hidden_codes": "2176/2176", "argmax_id": "17/17", "logit_codes": "544/544", "pred_text": "what is awengeu  ", "all_exact": true}
-{"text": "how do i install it", "windows": 20, "bytes": 213452, "prims": 597, "render_s": 2.04, "heat": "2560/2560", "pred_glyph": "20/20", "ctx_actual_glyph": "120/120", "hidden_codes": "2560/2560", "argmax_id": "20/20", "logit_codes": "640/640", "pred_text": "wow toei snctrll an ", "all_exact": true}
-{"text": "hello, world", "windows": 13, "bytes": 210968, "prims": 597, "render_s": 1.78, "heat": "1664/1664", "pred_glyph": "13/13", "ctx_actual_glyph": "78/78", "hidden_codes": "1664/1664", "argmax_id": "13/13", "logit_codes": "416/416", "pred_text": "woyp o airdd ", "all_exact": true}
-{"text": "", "windows": 1, "bytes": 206125, "prims": 597, "render_s": 1.48, "heat": "128/128", "pred_glyph": "1/1", "ctx_actual_glyph": "6/6", "hidden_codes": "128/128", "argmax_id": "1/1", "logit_codes": "32/32", "pred_text": "w", "all_exact": true}
-{"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "windows": 97, "bytes": 238607, "prims": 597, "render_s": 4.06, "heat": "12416/12416", "pred_glyph": "97/97", "ctx_actual_glyph": "582/582", "hidden_codes": "12416/12416", "argmax_id": "97/97", "logit_codes": "3104/3104", "pred_text": "wlctttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt", "all_exact": true}
-{"text": "the repository is bobliuuu allgit before depending on it", "windows": 57, "bytes": 227033, "prims": 597, "render_s": 3.31, "heat": "7296/7296", "pred_glyph": "57/57", "ctx_actual_glyph": "342/342", "hidden_codes": "7296/7296", "argmax_id": "57/57", "logit_codes": "1824/1824", "pred_text": "whe aeao itiry on aebliuuu ali it aofore aoclndeng an an ", "all_exact": true}
+{"text": "46/46", "windows": 12, "bytes": 474408, "prims": 1466, "render_s": 5.13, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "at shopify. ", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
+{"text": "19/19", "windows": 12, "bytes": 473831, "prims": 1466, "render_s": 4.74, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "eii  noatiu ", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
+{"text": "16/16", "windows": 12, "bytes": 473819, "prims": 1466, "render_s": 6.26, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "ks qwentpu,s", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
+{"text": "12/12", "windows": 12, "bytes": 473723, "prims": 1466, "render_s": 5.33, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "ellaa ca aa ", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
+{"text": "0/0", "windows": 1, "bytes": 464629, "prims": 1466, "render_s": 3.52, "heat": "224/224", "pred": "1/1", "ctx": "7/7", "actual": "1/1", "decoded_prediction": "s", "all_exact": true, "hidden_codes": "224/224", "argmax_id": "1/1", "logit_codes": "32/32"}
+{"text": "96/96", "windows": 12, "bytes": 476036, "prims": 1466, "render_s": 5.13, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "nnnnnnnnnnnn", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
+{"text": "54/54", "windows": 12, "bytes": 474520, "prims": 1466, "render_s": 4.87, "heat": "2688/2688", "pred": "12/12", "ctx": "84/84", "actual": "12/12", "decoded_prediction": "typescript. ", "all_exact": true, "hidden_codes": "2688/2688", "argmax_id": "12/12", "logit_codes": "384/384"}
 stage2: PASS
+{"prompt": "jerry w", "generated": "orks on data infrastructure at shopify.", "reference": "orks on data infrastructure at shopify.", "same": true, "steps": 40, "seconds": 12.7}
+{"prompt": "cakebench is", "generated": " a kernel benchmark modelled on the cake paper.", "reference": " a kernel benchmark modelled on the cake paper.", "same": true, "steps": 48, "seconds": 15.1}
+{"prompt": "kvm is a", "generated": " funny discord bot.", "reference": " funny discord bot.", "same": true, "steps": 20, "seconds": 6.3}
+{"prompt": "the quick brown fox", "generated": " ylukes, iexrofkunnfadg igd isans avm lopensis tot nores s t", "reference": " ylukes, iexrofkunnfadg igd isans avm lopensis tot nores s t", "same": true, "steps": 60, "seconds": 18.8}
+{"prompt": "what is the capital", "generated": "ipes bomes, ges, a tune orelotd onsthe cat.", "reference": "ipes bomes, ges, a tune orelotd onsthe cat.", "same": true, "steps": 44, "seconds": 13.7}
+generation: 5/5 identical to the integer reference (67 s)
 ALL PASS

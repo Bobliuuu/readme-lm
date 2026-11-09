@@ -29,8 +29,8 @@ class Ctx:
         return s.prim(f'<feImage href="{png_uri(arr)}" x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="none" RESULT/>')
     def merge(s, names):
         return s.prim("<feMerge RESULT>" + "".join(f'<feMergeNode in="{n}"/>' for n in [s.bgf()] + list(names)) + "</feMerge>")
-    def merge_at(s, names, x, y, w, h):   # merge on a black flood confined to a sub-rectangle
-        fl = s.prim(f'<feFlood flood-color="#000" flood-opacity="1" x="{x}" y="{y}" width="{w}" height="{h}" RESULT/>')
+    def merge_at(s, names, x, y, w, h, color="#000"):   # merge on a flood (default black) confined to a sub-rectangle
+        fl = s.prim(f'<feFlood flood-color="{color}" flood-opacity="1" x="{x}" y="{y}" width="{w}" height="{h}" RESULT/>')
         return s.prim(f'<feMerge x="{x}" y="{y}" width="{w}" height="{h}" RESULT>' + "".join(f'<feMergeNode in="{n}"/>' for n in [fl] + list(names)) + "</feMerge>")
     def offset(s, src, dx, dy=0, x=None, y=None, w=None, h=None):
         if dx == 0 and dy == 0 and x is None: return src
@@ -120,13 +120,13 @@ def heat_tables(gain=1):
 def heat_decode_table():
     r, g, b = heat_tables(); return {(int(r[u]), int(g[u]), int(b[u])): u for u in range(256)}
 
-def glyph_cells(c, atlas_tile, mapimg, x, w):
+def glyph_cells(c, atlas_tile, mapimg, x, w, y=0, h=None):
     """draw glyphs: atlas_tile is the (vertically tiled) atlas result, placed at Ax=8; mapimg: R = id + 128 - X/16 per cell, G=128."""
-    return c.prim(f'<feDisplacementMap in="{atlas_tile}" in2="{mapimg}" scale="{255*DSTEP}" xChannelSelector="R" yChannelSelector="G" x="{x}" y="0" width="{w}" height="{c.rows}" RESULT/>')
+    return c.prim(f'<feDisplacementMap in="{atlas_tile}" in2="{mapimg}" scale="{255*DSTEP}" xChannelSelector="R" yChannelSelector="G" x="{x}" y="{y}" width="{w}" height="{c.rows if h is None else h}" RESULT/>')
 
-def atlas_node(c, atlas, ax=None):
+def atlas_node(c, atlas, ax=None, tag=""):
     """vertically tiled atlas at x=ax (cached per ax): tile row t holds glyph row (t-2) because displacement dy=+2 (G code 128)."""
-    ax = AX0 if ax is None else ax; key = ("atlas", ax)
+    ax = AX0 if ax is None else ax; key = ("atlas", ax, tag)
     if key not in c.cache:
         img = c.image(np.roll(atlas, 2, axis=0), x=ax, y=0); c.cache[key] = c.tile(img, ax, 0, atlas.shape[1], c.rows)
     return c.cache[key]
