@@ -27,7 +27,7 @@ A README is a static document: it can't run code. So "a language model in a READ
 
 | | 🟠 **A · Normal** | 🟢 **B · Pure MediaWiki** | 🟢 **C · Pure SVG** |
 |---|---|---|---|
-| **What it is** | real **GPT-2 small** (124M, int8) and a **600K QA model** that knows my repos | a **neural net written as MediaWiki formulas** | a **neural net drawn as SVG filters** |
+| **What it is** | real **GPT-2 small** (124M, int8) and a **600K QA model** that knows my repos | a **small MLP written as MediaWiki formulas** (not a transformer) | a **small MLP drawn as SVG filters** (not a transformer) |
 | **Weights live in** | Markdown files (`gpt2/`), and inside the profile README itself (QA, 417 KiB) | the page itself | the SVG itself |
 | **Who computes** | a ~150-line engine **inside a Markdown document**, run by one line of Python on a GitHub Action | **GitHub's own renderer** evaluates every `{{#expr}}` | **your browser's filter engine** |
 | **Needs an Action?** | yes, a minimal one | **no**: just open the page | **no**: just open the SVG |
@@ -63,7 +63,7 @@ The weights are Markdown (GPT-2 as 339 shards of base64 text, about 112 MB; the 
 <a name="version-b"></a>
 ## 🟢 Version B: pure MediaWiki, no Action to compute
 
-GitHub renders `.mediawiki` files. We wrote a neural net as MediaWiki formulas, so **GitHub's own renderer does every multiply-accumulate when the page loads**. This is one ReLU unit, straight from the page (`ifeq` on a comparison gives `a-b` when positive, else `0`):
+GitHub renders `.mediawiki` files. We wrote a small feed-forward network (an MLP, not a transformer) as MediaWiki formulas, so **GitHub's own renderer does every multiply-accumulate when the page loads**. This is one ReLU unit, straight from the page (`ifeq` on a comparison gives `a-b` when positive, else `0`):
 
 ```
 {{#ifeq:{{#expr:6*7+2*3+2*2+3*4 > 2*7+3*7+7*4+2*7+7*7+7}}|1|{{#expr:6*7+2*3+2*2+3*4-(2*7+3*7+7*4+2*7+7*7+7)}}|0}}
@@ -78,7 +78,7 @@ It is a toy (2-character context, 12 hidden units, trained on 194 characters): M
 <a name="version-c"></a>
 ## 🟢 Version C: pure SVG, no code, your browser computes
 
-The picture below is **not an image of a computation: it is the computation**. A 7-character-context, 224-unit neural net is written as SVG filter primitives: `feConvolveMatrix` does the multiply-accumulates, `feComponentTransfer` tables do the ReLU, `feMorphology` takes the argmax and `feDisplacementMap` draws the answer. Your browser's filter engine evaluates it as the page loads.
+The picture below is **not an image of a computation: it is the computation**. A 7-character-context, 224-unit feed-forward network (an MLP: no attention, so **not a transformer**) is written as SVG filter primitives: `feConvolveMatrix` does the multiply-accumulates, `feComponentTransfer` tables do the ReLU, `feMorphology` takes the argmax and `feDisplacementMap` draws the answer. Your browser's filter engine evaluates it as the page loads.
 
 <div align="center">
 <img src="demos/svg/latest.svg" alt="Live SVG filter network computed by your browser" width="640">
@@ -87,7 +87,7 @@ The picture below is **not an image of a computation: it is the computation**. A
 
 <sub>Top: the live network (blue = what the filters predicted, white = the actual next character). Bottom: a reference render from Chrome at 1x. ⚠️ Filters run at device pixels: on a Retina display, a zoomed page or a narrow phone the live one will look wrong, and the reference shows what it should compute.</sub>
 
-It recites all 47 of its training sentences exactly and is bit-exact against an integer reference. It can't be chained deeper than two layers (the renderer crashes), so it spends its parameters on width and context. [Report](demos/svg/REPORT.md).
+The transformer pieces (RMSNorm, RoPE, causal attention, softmax) were also built as exact filter graphs and checked op by op, but chaining them into a full block does not render in Chrome, which is why the shipped net is a two-layer MLP. It recites all 47 of its training sentences exactly and is bit-exact against an integer reference. It can't be chained deeper than two layers (the renderer crashes), so it spends its parameters on width and context. [Report](demos/svg/REPORT.md).
 
 <a name="deploy"></a>
 ## 🚀 Deploy it yourself
