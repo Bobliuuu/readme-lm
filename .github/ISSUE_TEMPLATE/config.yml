@@ -9,6 +9,6 @@ contact_links:
   - name: "mediawiki: example text (GitHub's renderer does the math)"
     url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text
     about: A tiny neural net in MediaWiki markup that GitHub's own renderer computes.
-  - name: "svg: example text (your browser does the math, coming soon)"
+  - name: "svg: example text (a filter network Chrome computes)"
     url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=svg.md&title=svg%3A+example+text
-    about: A tiny neural net drawn as SVG filters that your own browser computes; still being built.
+    about: A tiny neural net drawn as SVG filters; Chrome's filter engine computes its predictions.
