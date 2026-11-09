@@ -8,7 +8,7 @@ Language models stored as Markdown. This repo holds three different things, with
 | 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo, numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
 | 3. Clickable model | char-level MLP (3-character context, 92K params) compiled into 2,622 Markdown states | this README, as links | nowhere: no Action, no JavaScript, you click | [start here](#s-the) |
 | 4. Compiled link graphs | real GPT-2 (12 prompts) and the QA transformer (687 questions), as click-through pages in `graph/` | `graph/*.md` | nowhere: no Action, no JavaScript, you click precomputed predictions | [GPT-2 graphs](graph/gpt2/README.md) · [QA graph](graph/qa/README.md) |
-| 5. Executable Markdown (`mdrt`) | GPT-2 as a `.md` document: weights by reference, forward pass as a declarative program, run block | `gpt2/*.md` shards | `mdrt/mdrt.py`, a Markdown renderer we wrote (not GitHub's) | `python3 mdrt/mdrt.py mdrt/gpt2.md` |
+| 5. Self-contained executable Markdown | one `.md` document carrying the engine source, the forward-pass program and a run request; weights by reference | `gpt2/*.md` shards | the engine extracted from the document, run by one line of Python | [`mdrt/GPT2.md`](mdrt/GPT2.md) |
 
 ## 4. Compiled link graphs (`graph/`)
 
@@ -20,9 +20,15 @@ Pure Markdown navigation, no Action and no JavaScript: GitHub renders the pages 
 
 This is navigation of precomputed predictions, not computation. GitHub's renderer has no input-dependent arithmetic (see `trackB/PROBE.md`, which tests what its sanitizer keeps and strips), so a GPT-2 forward pass cannot run inside a rendered README.
 
-## 5. Executable Markdown (`mdrt/`)
+## 5. Self-contained executable Markdown (`mdrt/GPT2.md`)
 
-`mdrt/gpt2.md` is a Markdown document whose weights are referenced from the `gpt2/` shards, whose forward pass is a declarative program (`embed`, `layernorm`, `linear`, `attention`, `gelu`, `add`, `head`), and whose `mdrt-run` block requests generation. `mdrt/mdrt.py` renders it: it interprets the program once per token and writes the document with the generated tokens and top-3 candidates filled in. Greedy output for 24 tokens is identical to `gpt2/run.py` (verified), at about 47 s on a laptop CPU. The renderer is ours, not GitHub's.
+[`mdrt/GPT2.md`](mdrt/GPT2.md) is one Markdown document that carries: the engine (about 150 lines of Python: shard reader, GPT-2 byte-level BPE, tensor ops, an interpreter for the program block), the GPT-2 forward pass as a declarative program (`embed`, `layernorm`, `linear`, `attention`, `gelu`, `add`, `head`), and a run request. The weights stay in the `gpt2/` Markdown shards, referenced from the document. The only thing outside the Markdown is a Python interpreter and this bootstrap line, which extracts the engine from the document itself and runs it:
+
+```sh
+python3 -c "import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+'python mdrt-engine\n(.*?)\n'+chr(96)*4,t,re.S).group(1))" mdrt/GPT2.md
+```
+
+Greedy output for 24 tokens is identical to `gpt2/run.py` (verified), in about 46 s on a laptop CPU. GitHub's renderer only displays this document; the computation is done by the extracted engine, so this is Markdown as the complete artifact, not Markdown executing itself. What GitHub's own math renderer could and could not do is measured in `trackB/PROBE.md` (stock MathJax: macros and delimiter pattern matching work, but there is no arithmetic, no conditionals and about 1,000 macro substitutions per expression).
 
 ## 1. QA model inside a README
 

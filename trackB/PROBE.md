@@ -51,3 +51,17 @@ URL fragment (scroll or highlight only; GitHub highlights `#L10` in file views, 
 5. Conclusion: a GPT-2 or tiny-transformer forward pass cannot run in a README. There is no input-dependent arithmetic primitive. Autonomous generation, where the output token is computed from the previous output, is impossible without a trigger outside the file.
 6. The best achievable is a static lookup table, or precomputed fan-out pages with links (each token a link to the next precomputed README or anchor). That is a human-navigated finite-state browser, not computation.
 7. Issue task-list popcount and reactions are human-set state with GitHub-fixed aggregation, so they are no autonomous compute either.
+
+
+## Addendum: stock MathJax capability test (not GitHub's configuration)
+
+Run locally with `mathjax-full` 3.2.2 in node, default settings, TeX packages base + newcommand + configmacros. A live github.com page was not tested (publishing a probe file was blocked), so GitHub's actual MathJax configuration is unverified.
+
+| TeX feature | Result |
+|---|---|
+| `\def`, `\newcommand` | works (`\def\a{7}\a` renders 7) |
+| `\def` with delimited arguments (pattern matching) | works and computes: `\def\f#1+#2={#2#1}\f 3+4=` gives 43; `\def\u#1\|{#1#1#1}\u 1\|` gives 111 |
+| `\ifx`, `\the`, `\numexpr`, `\count`, `\csname`, `\gdef` | undefined control sequence |
+| macro-substitution budget | default `maxMacros` = 1000: about 111 expansions pass, about 1,110 fail with "maximum macro substitution count exceeded" |
+
+Consequence: macro rewriting and delimiter pattern matching give a tiny lookup/rewrite engine, but with no arithmetic primitives, no conditionals, and roughly 1,000 substitutions per expression, and with no viewer input (the expression is fixed by the file). At most it can evaluate a very small fixed function of the document's own text. A transformer forward pass (hundreds of thousands to 124M multiply-accumulates per token) does not fit.
