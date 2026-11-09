@@ -72,7 +72,7 @@ jobs:
           mkdir -p profile/demos/mediawiki
           python3 demos/mediawiki/gen.py "$(cat prompt.txt)" -o profile/demos/mediawiki/README.mediawiki > gen.json
           git -C profile add demos/mediawiki/README.mediawiki; git -C profile commit -m "chore: mediawiki page for issue $N" || true
-          git -C profile pull --rebase -q; git -C profile push; PAGE_SHA=$(git -C profile rev-parse HEAD)
+          git -C profile pull --rebase --autostash -q; git -C profile push; PAGE_SHA=$(git -C profile rev-parse HEAD)
           for i in 1 2 3 4 5 6; do
             gh api -H "Accept: application/vnd.github.html+json" "repos/${PROFILE}/readme/demos/mediawiki?ref=${PAGE_SHA}" > live.html 2>/dev/null || true
             python3 demos/mediawiki/live_predictions.py live.html > live.json 2>live.err && break; sleep 8
@@ -90,7 +90,7 @@ jobs:
           python3 -c "import json;d=json.load(open('gen.json'));print(d['generated'].strip() or '(nothing)')" > typed.txt
           python3 gpt2/render_svg.py profile/assets/readme-lm.svg "$(python3 -c "import json;print(json.load(open('gen.json'))['input'])")" typed.txt "SVG net - every character computed by Chrome's filter engine" svg
           git -C profile add demos/svg/latest.svg; git -C profile commit -m "chore: svg net for issue $N" || true
-          git -C profile pull --rebase -q; git -C profile push; SVG_SHA=$(git -C profile rev-parse HEAD)
+          git -C profile pull --rebase --autostash -q; git -C profile push; SVG_SHA=$(git -C profile rev-parse HEAD)
           RAW="https://raw.githubusercontent.com/${PROFILE}/${SVG_SHA}/demos/svg/latest.svg"
           { echo "Every character of the continuation was computed by an **SVG filter network** in Chrome's filter engine (here on the Action's headless Chrome); the Action only wrote your text into the SVG and read the result back."; echo
             echo '```'; cat typed.txt; echo '```'; echo
