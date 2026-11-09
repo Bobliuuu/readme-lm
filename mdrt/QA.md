@@ -150,7 +150,9 @@ def main():
             out.append(voc[t]); ids = ids + [t]
         ans = "".join(out); show = lambda c: "space" if c == " " else c.replace("|", "/")
         tbl = "\n".join(f"| {i} | `{ans[:i][-18:]}` | " + " · ".join(f"`{show(c)}` {pp*100:.0f}%" for c, pp in tp) + " |" for i, tp in pts[:40])
-        return (f"**Question:** {q}\n\n**Answer ({len(ans)} characters, greedy):**\n\n> {ans}\n\nPlaces where the model was less than 95% sure (up to 40):\n\n| position | text before | top-3 next characters |\n|---|---|---|\n{tbl}\n")
+        head = f"**Question:** {q}\n\n**Answer ({len(ans)} characters, greedy):**\n\n> {ans}\n\n"
+        if not pts: return head + "The model was at least 95% sure of every character, so there were no real alternatives to show.\n"
+        return head + f"Places where the model was less than 95% sure (up to 40):\n\n| position | text before | top-3 next characters |\n|---|---|---|\n{tbl}\n"
     outs = []
     def sub(m): s = run_block(m); outs.append(s); return s
     rendered = re.sub(FENCE + r"mdrt-run\n(.*?)\n" + FENCE, sub, md, flags=re.S)
