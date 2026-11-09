@@ -23,13 +23,13 @@ jobs:
       IN_MODE: ${{ inputs.mode }}
       IN_TEXT: ${{ inputs.text }}
       RUNNUM: ${{ github.run_number }}
-      PROFILE: Bobliuuu/Bobliuuu
+      PROFILE: ${{ github.repository_owner }}/${{ github.repository_owner }}
     steps:
       - uses: actions/checkout@v4
       - name: check out the profile repo (write access through a deploy key)
         uses: actions/checkout@v4
         with:
-          repository: Bobliuuu/Bobliuuu
+          repository: ${{ github.repository_owner }}/${{ github.repository_owner }}
           ssh-key: ${{ secrets.PROFILE_DEPLOY_KEY }}
           path: profile
       - uses: actions/setup-python@v5
@@ -48,7 +48,7 @@ jobs:
         if: env.MODE == 'qa'
         run: |
           python3 profile/readme-lm/ask.py profile/README.md profile/assets/readme-lm.svg "$SEED" "$(cat prompt.txt)" > out.txt
-          { echo '```'; cat out.txt; echo '```'; echo; echo "Answered by the 4-bit transformer stored inside the profile README (numpy forward pass). It only knows Jerry's public GitHub repos."; } > body.md
+          { echo '```'; cat out.txt; echo '```'; echo; echo "Answered by the 4-bit transformer stored inside the profile README (numpy forward pass). It only knows what it was trained on (the facts in qa/g*.jsonl)."; } > body.md
       - name: gpt2 (real GPT-2 small, run from a Markdown document)
         if: env.MODE == 'gpt2'
         run: |

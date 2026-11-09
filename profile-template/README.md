@@ -1,0 +1,20 @@
+# Hi, I'm OWNER
+
+<!-- Replace this paragraph with your bio. Everything outside the LM-DEMO and LM-WEIGHTS markers is yours. -->
+Short bio goes here: what you build, what you are learning, where to find you.
+
+<!--LM-DEMO-START-->
+<img src="assets/readme-lm.svg?v=0" alt="A tiny language model answering a question, animated" width="100%">
+
+**Type something and watch this animation change.** Each link opens a new issue in [REPO](https://github.com/OWNER/REPO); an Action runs the model and rewrites the animation above (takes about a minute):
+
+- [Ask the 600K-parameter QA model that lives inside this README](https://github.com/OWNER/REPO/issues/new?template=qa.md)
+- [Real GPT-2 small, run from a Markdown document](https://github.com/OWNER/REPO/issues/new?template=gpt2.md)
+- [A tiny net computed by GitHub's own MediaWiki renderer](https://github.com/OWNER/REPO/issues/new?template=mediawiki.md)
+- [A tiny net computed by Chrome's SVG filter engine](https://github.com/OWNER/REPO/issues/new?template=svg.md)
+
+Built with [README-LM](https://github.com/OWNER/REPO). If the form opens blank, type the title yourself, for example `qa: what is this`.
+<!--LM-DEMO-END-->
+
+<!--LM-WEIGHTS-START-->
+<!--LM-WEIGHTS-END-->

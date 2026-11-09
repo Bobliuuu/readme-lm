@@ -1,0 +1,103 @@
+name: readme-lm
+on:
+  schedule: [{cron: "17 */3 * * *"}]
+  workflow_dispatch:
+    inputs:
+      mode: {description: "gpt2, qa, mediawiki or svg", required: false, default: "qa"}
+      text: {description: "input text", required: false, default: ""}
+permissions:
+  contents: write
+concurrency: readme-lm
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+      IN_MODE: ${{ inputs.mode }}
+      IN_TEXT: ${{ inputs.text }}
+      RUNNUM: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: check out the readme-lm repo (engines, GPT-2 shards, demo generators)
+        uses: actions/checkout@v4
+        with: {repository: "${{ github.repository_owner }}/readme-lm", path: rl}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install numpy regex pillow playwright
+      - name: parse the inputs
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then MODE="$IN_MODE"; P="$IN_TEXT"; SEED="$RUNNUM"; N="run$RUNNUM"
+          else MODE=qa; P=""; SEED="$RUNNUM"; N="cron$RUNNUM"; fi
+          P="$(printf '%s' "$P" | tr -d '\r\n`' | sed 's/^ *//; s/ *$//' | cut -c1-200)"
+          { echo "MODE=$MODE"; echo "SEED=$SEED"; echo "N=$N"; } >> "$GITHUB_ENV"
+          printf '%s' "$P" | sed 's/@/(at)/g' > prompt.txt
+          git config user.name "readme-lm[bot]"; git config user.email "readme-lm@users.noreply.github.com"
+      - name: qa (the 600K model stored inside this README)
+        if: env.MODE == 'qa'
+        run: |
+          python3 readme-lm/ask.py README.md assets/readme-lm.svg "$SEED" "$(cat prompt.txt)" > out.txt
+          { echo '```'; cat out.txt; echo '```'; echo; echo "Answered by the 4-bit transformer stored inside the profile README (numpy forward pass). It only knows what it was trained on."; } > body.md
+      - name: gpt2 (real GPT-2 small, run from a Markdown document)
+        if: env.MODE == 'gpt2'
+        run: |
+          PROMPT="$(cat prompt.txt)" python3 - <<'PY'
+          import os, re
+          d = open("rl/mdrt/GPT2.md").read(); p = os.environ["PROMPT"] or "example text"
+          d = re.sub(r"^prompt: .*$", lambda m: "prompt: " + p, d, count=1, flags=re.M)
+          d = re.sub(r"^tokens: \d+$", "tokens: 40", d, count=1, flags=re.M)
+          d = re.sub(r"^seed: \d+$", "seed: " + os.environ["SEED"], d, count=1, flags=re.M)
+          open("rl/mdrt/_run.md", "w").write(d)
+          PY
+          BOOT='import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+"python mdrt-engine\n(.*?)\n"+chr(96)*4,t,re.S).group(1))'
+          python3 -c "$BOOT" rl/mdrt/_run.md --run-only -o rendered.md
+          sed -i 's/@/(at)/g' rendered.md
+          sed -n 's/^> //p' rendered.md | head -1 | sed 's/ ⏎ / /g' > typed.txt
+          python3 rl/gpt2/render_svg.py assets/readme-lm.svg "$(cat prompt.txt)" typed.txt "GPT-2 small - 124M params - int8 - run from Markdown" gpt2
+          { cat rendered.md; echo; echo "---"; echo "GPT-2 small (124M, int8) ran from [\`mdrt/GPT2.md\`](https://github.com/${{ github.repository_owner }}/readme-lm/blob/main/mdrt/GPT2.md): the engine, the forward-pass program, the tokenizer and the weights are all Markdown. It is a base language model: it continues text and can be odd."; } > body.md
+      - name: mediawiki (GitHub's own renderer does the arithmetic)
+        if: env.MODE == 'mediawiki'
+        run: |
+          mkdir -p demos/mediawiki
+          python3 rl/demos/mediawiki/gen.py "$(cat prompt.txt)" -o demos/mediawiki/README.mediawiki > gen.json
+          git add demos/mediawiki/README.mediawiki; git commit -m "chore: mediawiki page for issue $N" || true
+          git pull --rebase -q; git push; PAGE_SHA=$(git rev-parse HEAD); echo "PAGE_SHA=$PAGE_SHA" >> "$GITHUB_ENV"
+          for i in 1 2 3 4 5 6; do
+            gh api -H "Accept: application/vnd.github.html+json" "repos/${GITHUB_REPOSITORY}/readme/demos/mediawiki?ref=${PAGE_SHA}" > live.html 2>/dev/null || true
+            python3 rl/demos/mediawiki/live_predictions.py live.html > live.json 2>live.err && break; sleep 8
+          done
+          python3 -c "import json;d=json.load(open('live.json'));print(''.join(' ' if w['pred'] in ('\u2423',' ','') else w['pred'] for w in d['windows']).strip())" > typed.txt
+          python3 rl/gpt2/render_svg.py assets/readme-lm.svg "$(python3 -c "import json;print(json.load(open('gen.json'))['input'])")" typed.txt "MediaWiki net - computed live by GitHub's renderer" mediawiki
+          { echo "These next-character predictions were **computed by GitHub's own MediaWiki renderer** when it rendered [the generated page](https://github.com/${GITHUB_REPOSITORY}/blob/${PAGE_SHA}/demos/mediawiki/README.mediawiki). The Action only wrote your text into the page and read the rendered result."; echo; echo '```'; cat typed.txt; echo '```'; echo; echo "_Summary:_ \`$(sed 's/@/(at)/g; s/`//g' gen.json)\`"; } > body.md
+      - name: svg (a filter network that Chrome's filter engine computes)
+        if: env.MODE == 'svg'
+        run: |
+          mkdir -p demos/svg
+          python3 rl/demos/svg/gen.py "$(cat prompt.txt)" -o demos/svg/latest.svg > gen.json
+          git add demos/svg/latest.svg; git commit -m "chore: svg net for issue $N" || true
+          git pull --rebase -q; git push; SVG_SHA=$(git rev-parse HEAD)
+          python3 rl/demos/svg/decode.py "$(cat prompt.txt)" demos/svg/latest.svg > live.json
+          rm -f demos/svg/_h.html
+          python3 -c "import json;d=json.load(open('live.json'));print(d['pred'].replace('\u00b7',' ').strip())" > typed.txt
+          python3 rl/gpt2/render_svg.py assets/readme-lm.svg "$(python3 -c "import json;print(json.load(open('gen.json'))['input'])")" typed.txt "SVG net - computed by Chrome's filter engine" svg
+          RAW="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SVG_SHA}/demos/svg/latest.svg"
+          { echo "These next-character predictions were drawn by an **SVG filter network**: every multiply-accumulate is a filter primitive, computed by Chrome's filter engine (here on the Action's headless Chrome; the Action only wrote your text into the SVG and read the pixels back)."; echo
+            echo '```'; cat typed.txt; echo '```'; echo
+            echo "The live network is below. **Your own browser computes it**, but it is only correct at 100% zoom on a non-Retina display in a Chrome-based browser. [Open the SVG]($RAW)."; echo
+            echo "<img src=\"$RAW\" width=\"624\" alt=\"SVG filter neural network\">"; echo
+            echo "_Summary:_ \`$(sed 's/@/(at)/g; s/`//g' live.json)\`"; } > body.md
+      - name: update the README animation, commit, and pin it to a commit
+        run: |
+          H=$(sha1sum assets/readme-lm.svg | cut -c1-8)
+          sed -i -E "s#assets/readme-lm\.svg(\?v=[0-9a-f]+)?#assets/readme-lm.svg?v=${H}#" README.md
+          git add assets/readme-lm.svg README.md
+          if ! git diff --cached --quiet; then git commit -m "chore: $MODE demo for $N"; git pull --rebase -q; git push; fi
+          echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: write the reply
+        run: |
+          { echo "**Mode:** \`$MODE\` | **Input:** \`$(cat prompt.txt | sed 's/`//g')\`"; echo
+            echo "![animation](https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SHA}/assets/readme-lm.svg)"; echo
+            echo "The profile's animation (assets/readme-lm.svg) now shows this result."; echo; cat body.md; } > comment.md
+      - name: print the result
+        run: cat comment.md

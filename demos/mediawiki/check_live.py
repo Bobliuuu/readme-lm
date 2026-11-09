@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Verify GitHub's OWN rendering of demos/mediawiki/README.mediawiki.
-  gh api -H 'Accept: application/vnd.github.html+json' repos/Bobliuuu/readme-lm/readme/demos/mediawiki > out_live.html
+  gh api -H 'Accept: application/vnd.github.html+json' repos/OWNER/REPO/readme/demos/mediawiki > out_live.html
   python3 check_live.py out_live.html
 Compares every live cell (all window predictions + the worked example) with an independent python-int forward pass."""
 import sys, os, re
