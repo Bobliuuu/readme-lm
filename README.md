@@ -19,7 +19,7 @@ Open an issue and put the mode in the title:
 
 A GitHub Action runs the matching executable Markdown document (`mdrt/GPT2.md` or `mdrt/QA.md`: engine source, forward-pass program, tokenizer and weights all live in Markdown), replies with the Markdown that document produced, and shows an animation of the result. Latest QA result:
 
-<div align="center"><img src="qa/latest.svg?v=0" alt="Typing animation of the latest QA answer" width="640"></div>
+<div align="center"><img src="qa/latest.svg?v=efc70962" alt="Typing animation of the latest QA answer" width="640"></div>
 
 ## 4. Compiled link graphs (`graph/`)
 
