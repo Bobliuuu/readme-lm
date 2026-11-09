@@ -1,0 +1,74 @@
+name: demos
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      mode: {description: "mediawiki or svg", required: true, default: "svg"}
+      text: {description: "input text", required: true}
+permissions:
+  contents: write
+  issues: write
+concurrency: demos
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.issue.title, 'mediawiki:') || startsWith(github.event.issue.title, 'svg:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+      TITLE: ${{ github.event.issue.title }}
+      ISSUE: ${{ github.event.issue.number }}
+      IN_MODE: ${{ inputs.mode }}
+      IN_TEXT: ${{ inputs.text }}
+      RUNNUM: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install numpy pillow
+      - name: write the input into the demo (the Action does no arithmetic)
+        run: |
+          if [ "$EVENT" = issues ]; then
+            case "$TITLE" in mediawiki:*) MODE=mediawiki; P="${TITLE#mediawiki:}";; *) MODE=svg; P="${TITLE#svg:}";; esac; N="$ISSUE"
+          else MODE="$IN_MODE"; P="$IN_TEXT"; N="run$RUNNUM"; fi
+          P="$(printf '%s' "$P" | tr -d '\r\n`' | sed 's/^ *//; s/ *$//' | cut -c1-200)"
+          echo "MODE=$MODE" >> "$GITHUB_ENV"; echo "N=$N" >> "$GITHUB_ENV"
+          if [ "$MODE" = mediawiki ]; then
+            python3 demos/mediawiki/gen.py "$P" -o demos/mediawiki/README.mediawiki > gen.json
+            git add demos/mediawiki/README.mediawiki
+          else
+            python3 demos/svg/gen.py "$P" -o demos/svg/latest.svg > gen.json
+            H=$(sha1sum demos/svg/latest.svg | cut -c1-8)
+            sed -i -E "s#demos/svg/latest\.svg(\?v=[0-9a-f]+)?#demos/svg/latest.svg?v=${H}#" README.md
+            git add demos/svg/latest.svg README.md
+          fi
+          cat gen.json
+      - name: commit and pin the result to a commit
+        run: |
+          git config user.name "demos[bot]"; git config user.email "demos@users.noreply.github.com"
+          git commit -m "chore: $MODE demo for $N" || true
+          git pull --rebase -q; git push
+          echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: write the reply
+        run: |
+          SANE="$(python3 -c "import json;print(json.load(open('gen.json'))['input'])" | sed 's/@/(at)/g; s/\`//g')"
+          if [ "$MODE" = mediawiki ]; then
+            { echo "**mediawiki demo** for \`$SANE\`"; echo
+              echo "[Open the rendered page](https://github.com/${GITHUB_REPOSITORY}/blob/${SHA}/demos/mediawiki/README.mediawiki): every number in its table is evaluated by GitHub's own MediaWiki renderer when the page loads. This Action only wrote your text into the page; it did no arithmetic."; echo
+              echo "_Summary:_ \`$(cat gen.json | sed 's/@/(at)/g; s/\`//g')\`"; } > comment.md
+          else
+            { echo "**svg demo** for \`$SANE\`"; echo
+              echo "![svg filter network](https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SHA}/demos/svg/latest.svg)"; echo
+              echo "The picture above is computed by **your browser's SVG filter engine**: every multiply-accumulate and ReLU is a filter primitive. This Action only wrote your text into the file; it did no arithmetic. It is valid at 1x pixel ratio in Chrome. [Open the SVG](https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SHA}/demos/svg/latest.svg)"; echo
+              echo "_Summary:_ \`$(cat gen.json | sed 's/@/(at)/g; s/\`//g')\`"; } > comment.md
+          fi
+      - name: reply and close
+        if: github.event_name == 'issues'
+        run: |
+          gh issue comment "$ISSUE" --body-file comment.md
+          gh issue close "$ISSUE" --reason completed
+      - name: print (manual runs)
+        if: github.event_name != 'issues'
+        run: cat comment.md
