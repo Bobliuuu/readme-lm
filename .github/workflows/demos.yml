@@ -1,0 +1,120 @@
+name: demos
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      mode: {description: "gpt2, qa, mediawiki or svg", required: true, default: "qa"}
+      text: {description: "input text", required: true, default: "where does jerry work"}
+permissions:
+  contents: write
+  issues: write
+concurrency: demos
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.issue.title, 'gpt2:') || startsWith(github.event.issue.title, 'qa:') || startsWith(github.event.issue.title, 'mediawiki:') || startsWith(github.event.issue.title, 'svg:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+      TITLE: ${{ github.event.issue.title }}
+      ISSUE: ${{ github.event.issue.number }}
+      IN_MODE: ${{ inputs.mode }}
+      IN_TEXT: ${{ inputs.text }}
+      RUNNUM: ${{ github.run_number }}
+      PROFILE: Bobliuuu/Bobliuuu
+    steps:
+      - uses: actions/checkout@v4
+      - name: check out the profile repo (write access through a deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: Bobliuuu/Bobliuuu
+          ssh-key: ${{ secrets.PROFILE_DEPLOY_KEY }}
+          path: profile
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install numpy regex pillow playwright
+      - name: parse the issue title
+        run: |
+          if [ "$EVENT" = issues ]; then
+            case "$TITLE" in gpt2:*) MODE=gpt2; P="${TITLE#gpt2:}";; mediawiki:*) MODE=mediawiki; P="${TITLE#mediawiki:}";; svg:*) MODE=svg; P="${TITLE#svg:}";; *) MODE=qa; P="${TITLE#qa:}";; esac; SEED="$ISSUE"; N="$ISSUE"
+          else MODE="$IN_MODE"; P="$IN_TEXT"; SEED="$RUNNUM"; N="run$RUNNUM"; fi
+          P="$(printf '%s' "$P" | tr -d '\r\n`' | sed 's/^ *//; s/ *$//' | cut -c1-200)"
+          { echo "MODE=$MODE"; echo "SEED=$SEED"; echo "N=$N"; } >> "$GITHUB_ENV"
+          printf '%s' "$P" | sed 's/@/(at)/g' > prompt.txt
+          git -C profile config user.name "readme-lm[bot]"; git -C profile config user.email "readme-lm@users.noreply.github.com"
+      - name: qa (the 600K model stored inside the profile README)
+        if: env.MODE == 'qa'
+        run: |
+          python3 profile/readme-lm/ask.py profile/README.md profile/assets/readme-lm.svg "$SEED" "$(cat prompt.txt)" > out.txt
+          { echo '```'; cat out.txt; echo '```'; echo; echo "Answered by the 4-bit transformer stored inside the profile README (numpy forward pass). It only knows Jerry's public GitHub repos."; } > body.md
+      - name: gpt2 (real GPT-2 small, run from a Markdown document)
+        if: env.MODE == 'gpt2'
+        run: |
+          PROMPT="$(cat prompt.txt)" python3 - <<'PY'
+          import os, re
+          d = open("mdrt/GPT2.md").read(); p = os.environ["PROMPT"] or "example text"
+          d = re.sub(r"^prompt: .*$", lambda m: "prompt: " + p, d, count=1, flags=re.M)
+          d = re.sub(r"^tokens: \d+$", "tokens: 40", d, count=1, flags=re.M)
+          d = re.sub(r"^seed: \d+$", "seed: " + os.environ["SEED"], d, count=1, flags=re.M)
+          open("mdrt/_run.md", "w").write(d)
+          PY
+          BOOT='import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+"python mdrt-engine\n(.*?)\n"+chr(96)*4,t,re.S).group(1))'
+          python3 -c "$BOOT" mdrt/_run.md --run-only -o rendered.md
+          sed -i 's/@/(at)/g' rendered.md
+          sed -n 's/^> //p' rendered.md | head -1 | sed 's/ ⏎ / /g' > typed.txt
+          python3 gpt2/render_svg.py profile/assets/readme-lm.svg "$(cat prompt.txt)" typed.txt "GPT-2 small - 124M params - int8 - run from Markdown" gpt2
+          { cat rendered.md; echo; echo "---"; echo "GPT-2 small (124M, int8) ran from [\`mdrt/GPT2.md\`](https://github.com/${GITHUB_REPOSITORY}/blob/main/mdrt/GPT2.md): the engine, the forward-pass program, the tokenizer and the weights are all Markdown. It is a base language model: it continues text and can be odd."; } > body.md
+      - name: mediawiki (GitHub's own renderer does the arithmetic)
+        if: env.MODE == 'mediawiki'
+        run: |
+          mkdir -p profile/demos/mediawiki
+          python3 demos/mediawiki/gen.py "$(cat prompt.txt)" -o profile/demos/mediawiki/README.mediawiki > gen.json
+          git -C profile add demos/mediawiki/README.mediawiki; git -C profile commit -m "chore: mediawiki page for issue $N" || true
+          git -C profile pull --rebase -q; git -C profile push; PAGE_SHA=$(git -C profile rev-parse HEAD)
+          for i in 1 2 3 4 5 6; do
+            gh api -H "Accept: application/vnd.github.html+json" "repos/${PROFILE}/readme/demos/mediawiki?ref=${PAGE_SHA}" > live.html 2>/dev/null || true
+            python3 demos/mediawiki/live_predictions.py live.html > live.json 2>live.err && break; sleep 8
+          done
+          python3 -c "import json;d=json.load(open('live.json'));print(''.join(' ' if w['pred'] in ('␣',' ','') else w['pred'] for w in d['windows']).strip())" > typed.txt
+          python3 gpt2/render_svg.py profile/assets/readme-lm.svg "$(python3 -c "import json;print(json.load(open('gen.json'))['input'])")" typed.txt "MediaWiki net - computed live by GitHub's renderer" mediawiki
+          { echo "These predictions were **computed by GitHub's own MediaWiki renderer** when it rendered [the generated page](https://github.com/${PROFILE}/blob/${PAGE_SHA}/demos/mediawiki/README.mediawiki). The Action only wrote your text into the page and read the rendered result."; echo; echo '```'; cat typed.txt; echo '```'; echo; echo "_Summary:_ \`$(sed 's/@/(at)/g; s/`//g' gen.json)\`"; } > body.md
+      - name: svg (a filter network that Chrome's filter engine computes)
+        if: env.MODE == 'svg'
+        run: |
+          python3 demos/svg/generate.py "$(cat prompt.txt)" -n 60 > gen.json
+          FULL="$(python3 -c "import json;d=json.load(open('gen.json'));print(d['input']+d['generated'])")"
+          mkdir -p profile/demos/svg
+          python3 demos/svg/gen.py "$FULL" -o profile/demos/svg/latest.svg > genpic.json
+          python3 -c "import json;d=json.load(open('gen.json'));print(d['generated'].strip() or '(nothing)')" > typed.txt
+          python3 gpt2/render_svg.py profile/assets/readme-lm.svg "$(python3 -c "import json;print(json.load(open('gen.json'))['input'])")" typed.txt "SVG net - every character computed by Chrome's filter engine" svg
+          git -C profile add demos/svg/latest.svg; git -C profile commit -m "chore: svg net for issue $N" || true
+          git -C profile pull --rebase -q; git -C profile push; SVG_SHA=$(git -C profile rev-parse HEAD)
+          RAW="https://raw.githubusercontent.com/${PROFILE}/${SVG_SHA}/demos/svg/latest.svg"
+          { echo "Every character of the continuation was computed by an **SVG filter network** in Chrome's filter engine (here on the Action's headless Chrome); the Action only wrote your text into the SVG and read the result back."; echo
+            echo '```'; cat typed.txt; echo '```'; echo
+            echo "The live network is below. **Your own browser computes it**, but it is only correct at 100% zoom on a non-Retina display in a Chrome-based browser. [Open the SVG]($RAW)."; echo
+            echo "<img src=\"$RAW\" width=\"640\" alt=\"SVG filter neural network\">"; echo
+            echo "_Summary:_ \`$(sed 's/@/(at)/g; s/`//g' gen.json)\`"; } > body.md
+      - name: update the profile README animation, commit, and pin it to a commit
+        run: |
+          cd profile
+          H=$(sha1sum assets/readme-lm.svg | cut -c1-8)
+          sed -i -E "s#assets/readme-lm\.svg(\?v=[0-9a-f]+)?#assets/readme-lm.svg?v=${H}#" README.md
+          git add assets/readme-lm.svg README.md
+          if ! git diff --cached --quiet; then git commit -m "chore: $MODE demo for $N"; git pull --rebase -q; git push; fi
+          echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: write the reply
+        run: |
+          { echo "**Mode:** \`$MODE\` | **Input:** \`$(cat prompt.txt | sed 's/`//g')\`"; echo
+            echo "![animation](https://raw.githubusercontent.com/${PROFILE}/${SHA}/assets/readme-lm.svg)"; echo
+            echo "The profile's animation ([assets/readme-lm.svg](https://github.com/${PROFILE}/blob/${SHA}/assets/readme-lm.svg)) now shows this result."; echo; cat body.md; } > comment.md
+      - name: reply and close
+        if: github.event_name == 'issues'
+        run: |
+          gh issue comment "$ISSUE" --body-file comment.md
+          gh issue close "$ISSUE" --reason completed
+      - name: print (manual runs)
+        if: github.event_name != 'issues'
+        run: cat comment.md

@@ -18,11 +18,11 @@ A README is a static document, so "a language model in a README" has to be answe
 
 ## Try it
 
-The demos run on the profile repo, so the animation at the top of [github.com/Bobliuuu](https://github.com/Bobliuuu) changes with every answer. Open an issue and replace `example text` in the title with anything you like:
+Open an issue in this repo and replace `example text` in the title with anything you like. An Action runs the model and rewrites the animation at the top of [github.com/Bobliuuu](https://github.com/Bobliuuu):
 
-- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.md&title=gpt2%3A+example+text&body=This%20will%20run%20an%20Action%20on%20%2A%2Areal%20GPT-2%20small%20%28124M%20parameters%29%2A%2A%20and%20update%20the%20animation%20at%20the%20top%20of%20the%20profile%20with%20its%20continuation%20of%20your%20text.%0A%0AReplace%20%60example%20text%60%20in%20the%20title%20above%20with%20anything%20you%20like%20%28a%20sentence%20to%20continue%29.%20You%20can%20leave%20this%20box%20as%20is.).
-- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.md&title=qa%3A+example+text&body=This%20will%20run%20an%20Action%20on%20a%20%2A%2A600K-parameter%20QA%20model%2A%2A%20%28its%20weights%20are%20stored%20inside%20the%20profile%20README%29%20and%20update%20the%20animation%20at%20the%20top%20of%20the%20profile%20with%20its%20answer.%0A%0AReplace%20%60example%20text%60%20in%20the%20title%20above%20with%20your%20question%20about%20Jerry%27s%20GitHub.%20You%20can%20leave%20this%20box%20as%20is.). Anything off-topic gets a refusal.
-- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text&body=This%20will%20write%20your%20text%20into%20a%20%2A%2AMediaWiki%20page%20that%20GitHub%27s%20own%20renderer%20computes%2A%2A%20with%20a%20tiny%20neural%20net%2C%20and%20update%20the%20animation%20at%20the%20top%20of%20the%20profile%20with%20the%20result.%0A%0AReplace%20%60example%20text%60%20in%20the%20title%20above%20with%20letters%2C%20spaces%20and%20basic%20punctuation%20%28up%20to%20about%2055%20characters%29.%20You%20can%20leave%20this%20box%20as%20is.). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
+- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+example+text).
+- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+example+text). Anything off-topic gets a refusal.
+- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
 - **Click through precomputed models:** [GPT-2 graphs](graph/gpt2/README.md), [QA graph](graph/qa/README.md), or the [character model at the bottom of this file](#s-the).
 - **Run the executable document yourself:** `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
 
@@ -108,7 +108,7 @@ GPT-2 small does not fit in one README (124M parameters against 500 KiB), so the
 python3 -c "import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+'python mdrt-engine\n(.*?)\n'+chr(96)*4,t,re.S).group(1))" mdrt/GPT2.md
 ```
 
-Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a laptop CPU. GitHub's renderer only displays these documents; the extracted engine does the arithmetic. The profile repo's workflow (`.github/workflows/readme-lm.yml` in [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu/blob/main/.github/workflows/readme-lm.yml), which checks this repo out) writes an issue's text into the run block, runs the document, renders the animation into the profile's `assets/readme-lm.svg`, and replies. It does no arithmetic of its own.
+Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a laptop CPU. GitHub's renderer only displays these documents; the extracted engine does the arithmetic. This repo's workflow (`.github/workflows/demos.yml`) writes an issue's text into the run block, runs the document, renders the animation into the profile repo's `assets/readme-lm.svg` (through a write deploy key), and replies. It does no arithmetic of its own.
 
 ### The pure-markup net (MediaWiki)
 
@@ -178,7 +178,7 @@ python3 build.py 3 5 0.04 100000 && python3 compose.py
 | `qa_infer.py`, `ask.py`, `gen.py` | numpy inference and animated SVGs |
 | `gpt2/` | GPT-2 shards, manifest, `run.py`, `convert.py` |
 | `mdrt/` | the executable documents `GPT2.md` and `QA.md`, their engines, `build_docs.py` |
-| (profile repo) `.github/workflows/readme-lm.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:`, `qa:`, `mediawiki:` and `svg:` flow: runs the engines and generators from this repo and rewrites the profile's `assets/readme-lm.svg` |
+| `.github/workflows/demos.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:`, `qa:`, `mediawiki:` and `svg:` flow: runs the engines and generators from this repo and rewrites the profile repo's `assets/readme-lm.svg` through a write deploy key |
 | `graph/` | compiled click-through graphs and their compilers |
 | `trackB/`, `trackC/`, `trackD/` | probe reports and builds: GitHub renderer, five substrates, MediaWiki and SVG-filter work |
 | `docs/` | figure and diagram generator (`make_figs.py`) and the images used in this README |
