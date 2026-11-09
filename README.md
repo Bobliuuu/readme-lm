@@ -20,9 +20,9 @@ A README is a static document, so "a language model in a README" has to be answe
 
 The demos run on the profile repo, so the animation at the top of [github.com/Bobliuuu](https://github.com/Bobliuuu) changes with every answer. Open an issue and replace `example text` in the title with anything you like:
 
-- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.md&title=gpt2%3A+example+text).
-- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.md&title=qa%3A+example+text). Anything off-topic gets a refusal.
-- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
+- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.yml&title=gpt2%3A+example+text).
+- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.yml&title=qa%3A+example+text). Anything off-topic gets a refusal.
+- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.yml&title=mediawiki%3A+example+text). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
 - **Click through precomputed models:** [GPT-2 graphs](graph/gpt2/README.md), [QA graph](graph/qa/README.md), or the [character model at the bottom of this file](#s-the).
 - **Run the executable document yourself:** `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
 

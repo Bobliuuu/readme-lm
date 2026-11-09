@@ -1,14 +1,14 @@
 blank_issues_enabled: true
 contact_links:
   - name: "gpt2: example text (real GPT-2 continues your text)"
-    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.md&title=gpt2%3A+example+text
+    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=gpt2.yml&title=gpt2%3A+example+text
     about: The demos run on the profile repo, so its animation changes with your answer. Replace "example text" with anything.
   - name: "qa: example text (ask the model about Jerry's GitHub)"
-    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.md&title=qa%3A+example+text
+    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=qa.yml&title=qa%3A+example+text
     about: A 600K-parameter model stored inside the profile README answers questions about my repos.
   - name: "mediawiki: example text (GitHub's renderer does the math)"
-    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text
+    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=mediawiki.yml&title=mediawiki%3A+example+text
     about: A tiny neural net in MediaWiki markup that GitHub's own renderer computes.
   - name: "svg: example text (a filter network Chrome computes)"
-    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=svg.md&title=svg%3A+example+text
+    url: https://github.com/Bobliuuu/Bobliuuu/issues/new?template=svg.yml&title=svg%3A+example+text
     about: A tiny neural net drawn as SVG filters; Chrome's filter engine computes its predictions.
