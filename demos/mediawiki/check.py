@@ -44,7 +44,7 @@ def verify_html(html, label):
         for r in t1[0][1:]:
             a, b = dec(r[1][0]), dec(r[1][1])
             ref = enc(VOC[fwd(VOC.index(a), VOC.index(b))[3]])
-            tot += 1; ok += (r[3] == ref); wins.append((a, b))
+            tot += 1; ok += (r[-1] == ref); wins.append((a, b))   # last cell = prediction (GitHub drops the empty 'actual next' cell of the final window)
     else: bad.append("no window table")
     if wins:
         h, z, bits, c = fwd(VOC.index(wins[-1][0]), VOC.index(wins[-1][1]))
