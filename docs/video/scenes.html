@@ -1,0 +1,249 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="scenes.css"></head><body>
+<div id="stage">
+
+<!-- 1 TITLE -->
+<section class="scene" id="sc-title">
+  <div id="toks"></div>
+  <div class="abs title-grad" data-s="0" data-a="scale" style="left:0;width:1280px;top:190px;text-align:center;font-size:132px;font-weight:800;letter-spacing:-4px">README-LM</div>
+  <div class="abs" data-s="0" data-d="0.5" data-a="up" style="left:0;width:1280px;top:360px;text-align:center;font-size:44px;font-weight:600">Can a README run a language model? 🤔</div>
+  <div class="abs mut mono" data-s="1" data-a="up" style="left:0;width:1280px;top:440px;text-align:center;font-size:24px">three versions, one question: who does the arithmetic?</div>
+</section>
+
+<!-- 2 PUZZLE -->
+<section class="scene" id="sc-puzzle">
+  <div class="hdr" data-s="0"><h2>🧩 The puzzle</h2></div>
+  <div class="card" data-s="0" data-a="left" style="left:48px;top:110px;width:520px;height:330px">
+    <div class="mono mut" style="font-size:15px;margin-bottom:12px">README.md</div>
+    <div class="h3"># Hello, I'm Jerry</div>
+    <div class="txt" style="margin-top:10px">A static document.<br>Text, links, images, a table.</div>
+    <div class="mono mut" style="margin-top:18px;font-size:16px;line-height:1.7">| weights | tokenizer | … |<br>| ------- | --------- | - |</div>
+    <div class="mono" style="margin-top:24px;font-size:20px;color:var(--yel)" data-s="2" data-d="2" data-a="fade">no code runs here</div>
+  </div>
+  <div class="abs big" data-s="0" data-d="0.8" data-a="up" style="left:48px;top:470px;font-size:36px">So who does the <span class="blue">arithmetic</span>?</div>
+  <div class="abs mut" style="left:620px;top:112px;font-size:18px" data-s="1" data-a="fade">GitHub's renderer strips:</div>
+  <div class="chip" style="left:620px;top:150px" data-s="1" data-a="right"><span class="strike" data-strike="1" data-d="0.5">&lt;script&gt;</span> <span class="x" data-s="1" data-d="0.8" data-a="fade">✗</span></div>
+  <div class="chip" style="left:620px;top:215px" data-s="1" data-d="0.3" data-a="right"><span class="strike" data-strike="1" data-d="0.9">CSS &lt;style&gt;</span> <span class="x" data-s="1" data-d="1.2" data-a="fade">✗</span></div>
+  <div class="chip" style="left:620px;top:280px" data-s="1" data-d="0.6" data-a="right"><span class="strike" data-strike="1" data-d="1.3">inline &lt;svg&gt;</span> <span class="x" data-s="1" data-d="1.6" data-a="fade">✗</span></div>
+  <div class="card" data-s="2" data-a="up" style="left:620px;top:350px;width:610px;height:190px">
+    <div class="mono mut" style="font-size:14px">MathJax in a GitHub README (measured)</div>
+    <div class="mono" style="font-size:22px;margin-top:12px">$$\newcommand{\x}{1}$$</div>
+    <div class="mono rd" style="font-size:20px;margin-top:14px" data-s="2" data-d="0.9" data-a="fade">⚠ Undefined control sequence</div>
+    <div class="txt mut" style="font-size:17px;margin-top:10px" data-s="2" data-d="1.2" data-a="fade">it cannot even define a macro</div>
+  </div>
+</section>
+
+<!-- 3 THREE VERSIONS -->
+<section class="scene" id="sc-three">
+  <div class="hdr" data-s="0"><h2>Three versions</h2></div>
+  <div class="card o" style="left:48px;top:120px;width:376px;height:400px" data-s="0" data-d="0.4" data-lit="1" data-a="up">
+    <span class="pill o">VERSION A</span>
+    <div class="abs" style="left:22px;top:70px;font-size:56px">⚙️</div>
+    <div class="abs h3" style="left:22px;top:150px;width:330px">Minimal engine on a GitHub Action</div>
+    <div class="abs txt" style="left:22px;top:225px;width:330px">Real GPT-2 and a QA model, run from Markdown.</div>
+    <div class="abs mono or" style="left:22px;top:330px;font-size:17px" data-s="2" data-d="1.5" data-a="fade">computes: a GitHub Action</div>
+  </div>
+  <div class="card g" style="left:452px;top:120px;width:376px;height:400px" data-s="0" data-d="0.8" data-lit="2" data-a="up">
+    <span class="pill g">VERSION B</span>
+    <div class="abs" style="left:22px;top:70px;font-size:56px">📄</div>
+    <div class="abs h3" style="left:22px;top:150px;width:330px">Pure MediaWiki</div>
+    <div class="abs txt" style="left:22px;top:195px;width:330px">No Action at all. A page full of {{#expr}}.</div>
+    <div class="abs mono gr" style="left:22px;top:330px;font-size:17px" data-s="2" data-d="1.5" data-a="fade">computes: GitHub's renderer</div>
+  </div>
+  <div class="card g" style="left:856px;top:120px;width:376px;height:400px" data-s="0" data-d="1.2" data-lit="2" data-a="up">
+    <span class="pill g">VERSION C</span>
+    <div class="abs" style="left:22px;top:70px;font-size:56px">🖼️</div>
+    <div class="abs h3" style="left:22px;top:150px;width:330px">Pure SVG, no code</div>
+    <div class="abs txt" style="left:22px;top:195px;width:330px">No Action at all. A neural net drawn as SVG filters.</div>
+    <div class="abs mono gr" style="left:22px;top:330px;font-size:17px" data-s="2" data-d="1.5" data-a="fade">computes: your browser</div>
+  </div>
+  <div class="abs mono" style="left:48px;top:556px;font-size:18px" data-s="2" data-a="fade"><span class="or">■ orange = Action</span> &nbsp;&nbsp; <span class="gr">■ green = no Action</span></div>
+</section>
+
+<!-- 4 VERSION A -->
+<section class="scene" id="sc-a">
+  <div class="hdr" data-s="0"><span class="pill o">VERSION A</span><h2>⚙️ The normal one</h2></div>
+  <div class="abs mono or" style="right:48px;top:42px;font-size:17px" data-s="4" data-d="2.5" data-a="fade">orange = needs the Action: engine + issue plumbing</div>
+  <!-- models -->
+  <div class="card" data-s="0" data-e="2" data-a="left" style="left:48px;top:120px;width:560px;height:300px">
+    <div class="h3 blue">GPT-2 small</div>
+    <div class="txt" style="margin-top:6px">124M parameters, int8</div>
+    <div class="mono" style="margin-top:34px;font-size:18px" data-s="1" data-d="0.1" data-a="up">perplexity <span class="gr">13.5</span> <span class="mut">(int8)</span> vs <span class="blue">13.4</span> <span class="mut">(fp32)</span></div>
+    <div class="abs mono mut" style="left:22px;top:210px;font-size:15px" data-s="1" data-d="0.4" data-a="fade">small test</div>
+  </div>
+  <div class="card" data-s="0" data-d="0.5" data-e="2" data-a="right" style="left:660px;top:120px;width:572px;height:300px">
+    <div class="h3 blue">QA model</div>
+    <div class="txt" style="margin-top:6px">600K parameters, 4-bit</div>
+    <div class="txt mut" style="margin-top:6px;font-size:17px" data-s="1" data-d="1.5" data-a="fade">answers about Jerry Zhu's public GitHub repos</div>
+    <div class="abs mono" style="left:22px;top:190px;font-size:15px" data-s="1" data-d="2.5" data-a="fade">weights live inside the profile README</div>
+    <div class="abs" style="left:22px;top:225px;width:520px;height:34px;border:1.5px solid var(--line);border-radius:8px" data-s="1" data-d="3" data-a="fade"></div>
+    <div class="abs" style="left:24px;top:227px;width:432px;height:30px;border-radius:6px;background:var(--blue)" data-s="1" data-d="3.3" data-a="grow"></div>
+    <div class="abs mono" style="left:22px;top:272px;font-size:16px" data-s="1" data-d="4.5" data-a="fade"><span class="blue">417 KiB</span> <span class="mut">of GitHub's</span> 500 KiB <span class="mut">limit</span></div>
+  </div>
+  <!-- engine -->
+  <div class="abs" data-s="2" data-e="3" data-a="fade" style="left:0;top:0;width:1280px;height:620px">
+    <div class="card" style="left:48px;top:140px;width:520px;height:330px">
+      <div class="mono mut" style="font-size:15px">mdrt/GPT2.md &nbsp;·&nbsp; one Markdown document</div>
+      <div class="mono blue" style="font-size:20px;margin-top:22px" data-s="2" data-d="0.4" data-a="up">▪ weights</div>
+      <div class="mono blue" style="font-size:20px;margin-top:14px" data-s="2" data-d="0.8" data-a="up">▪ tokenizer</div>
+      <div class="mono blue" style="font-size:20px;margin-top:14px" data-s="2" data-d="1.2" data-a="up">▪ forward-pass program</div>
+      <div class="mono blue" style="font-size:20px;margin-top:14px" data-s="2" data-d="1.6" data-a="up">▪ Python interpreter source</div>
+      <div class="mono mut" style="font-size:16px;margin-top:20px" data-s="2" data-d="2.0" data-a="fade">all inside .md files</div>
+    </div>
+    <div class="arrow o" style="left:600px;top:304px;width:100px" data-s="2" data-d="2.4" data-a="grow"></div>
+    <div class="card o" style="left:735px;top:140px;width:497px;height:330px" data-s="2" data-d="2.8" data-a="right" data-lit="2:2.9">
+      <div class="mono or" style="font-size:15px">runs on a GitHub Action</div>
+      <div class="term" style="margin-top:20px"><span class="gr">$</span> python3 -c "<span class="mut">…</span>" mdrt/GPT2.md</div>
+      <div class="txt" style="margin-top:22px">One line of Python.<br>Extract, then run.</div>
+      <div class="mono mut" style="font-size:16px;margin-top:18px">the document is the program</div>
+    </div>
+  </div>
+  <!-- flow -->
+  <div class="abs" data-s="3" data-e="4" data-ed="1.3" data-a="fade" style="left:0;top:0;width:1280px;height:620px">
+    <div class="card" style="left:48px;top:170px;width:330px;height:250px" data-lit="3">
+      <div class="mono mut" style="font-size:14px">New issue · readme-lm</div>
+      <div class="mono" style="font-size:20px;margin-top:16px;line-height:1.5" data-type="3" data-d="0.1" data-text="qa: example text"></div>
+    </div>
+    <div class="arrow o" style="left:392px;top:292px;width:80px" data-s="3" data-d="0.8" data-a="grow"></div>
+    <div class="card o" style="left:487px;top:210px;width:250px;height:170px" data-s="3" data-d="1.0" data-a="scale" data-lit="3:1.2">
+      <div style="font-size:44px">⚙️</div>
+      <div class="h3 or" style="margin-top:8px">GitHub Action</div>
+      <div class="mono mut" style="font-size:14px;margin-top:4px">runs the model</div>
+    </div>
+    <div class="arrow o" style="left:752px;top:292px;width:80px" data-s="3" data-d="1.6" data-a="grow"></div>
+    <div class="card" style="left:850px;top:150px;width:382px;height:290px" data-s="3" data-d="1.9" data-a="scale">
+      <div class="mono mut" style="font-size:14px">github.com/Bobliuuu · profile</div>
+      <div class="mono blue" style="font-size:17px;margin-top:14px">README-LM</div>
+      <div class="mono" style="font-size:20px;margin-top:14px;line-height:1.6;min-height:96px" data-type="3" data-d="2.4" data-text="jerry works on data infrastructure at shopify."></div>
+      <div class="mono mut" style="font-size:13px;margin-top:20px">assets/readme-lm.svg changes on every issue<br>(illustrative answer)</div>
+    </div>
+  </div>
+  <!-- gif -->
+  <div class="abs" data-s="4" data-d="1.0" data-a="up" style="left:260px;top:100px;width:760px;height:430px">
+    <div style="position:relative;width:760px;height:366px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line)" id="gifbox"></div>
+    <div class="mono mut" style="font-size:16px;margin-top:12px;text-align:center">real GPT-2 small, one frame per token · top-3 candidates</div>
+  </div>
+</section>
+
+<!-- 5 VERSION B -->
+<section class="scene" id="sc-b">
+  <div class="hdr" data-s="0"><span class="pill g">VERSION B</span><h2>📄 Pure MediaWiki</h2></div>
+  <div class="card g" data-s="0" data-a="left" data-lit="1" style="left:48px;top:105px;width:600px;height:330px">
+    <div class="mono mut" style="font-size:14px;margin-bottom:10px">README.mediawiki · ~100 KB of this</div>
+    <div class="code" id="wikicode"></div>
+  </div>
+  <div class="arrow g" style="left:660px;top:268px;width:60px" data-s="0" data-d="3.6" data-a="grow"></div>
+  <div class="card g" data-s="0" data-d="4.0" data-a="right" data-lit="0:4.2" style="left:735px;top:105px;width:497px;height:460px">
+    <div class="mono gr" style="font-size:14px">what GitHub's renderer shows</div>
+    <div class="mono mut" style="font-size:15px;margin-top:8px;display:flex;justify-content:space-between"><span>window</span><span>live prediction</span><span>= Python ref</span></div>
+    <div id="rows"></div>
+  </div>
+  <div class="abs" data-s="1" data-d="2.4" data-e="2" data-a="scale" style="left:48px;top:450px"><span class="pill g" style="font-size:28px;padding:10px 22px">✓ 40 / 40 exact</span></div>
+  <div class="abs mono mut" style="left:48px;top:520px;font-size:15px;width:640px" data-s="1" data-e="2" data-d="2.9" data-a="fade">vs a Python reference, on GitHub's production renderer</div>
+  <div class="abs" data-s="2" data-e="3" data-a="up" style="left:48px;top:440px;display:flex;gap:16px;background:var(--bg);width:640px;height:100px">
+    <div class="card" style="position:relative;width:200px;padding:12px 16px"><div class="mono blue" style="font-size:30px;font-weight:700">2</div><div class="mut" style="font-size:15px">chars of context</div></div>
+    <div class="card" style="position:relative;width:200px;padding:12px 16px"><div class="mono blue" style="font-size:30px;font-weight:700">12</div><div class="mut" style="font-size:15px">ReLU units</div></div>
+    <div class="card" style="position:relative;width:200px;padding:12px 16px"><div class="mono or" style="font-size:30px;font-weight:700">311 KB</div><div class="mut" style="font-size:15px">for 40 rows: no variables or loops</div></div>
+  </div>
+  <div class="abs" data-s="3" data-a="up" style="left:48px;top:540px;font-size:21px"><span class="pill g">no Action to compute</span> &nbsp;<span class="mut">the Action only types your text into the page</span></div>
+</section>
+
+<!-- 6 VERSION C -->
+<section class="scene" id="sc-c">
+  <div class="hdr" data-s="0" data-e="4"><span class="pill g">VERSION C</span><h2>🖼️ Pure SVG, no code</h2></div>
+  <div class="abs" data-s="0" data-d="0.1" data-e="4" data-a="fade" style="left:0;top:0;width:1280px;height:620px">
+    <div class="abs txt" style="left:48px;top:100px;font-size:22px">7-character context · <span class="blue">224 ReLU units</span> · 8-bit</div>
+    <div class="chip" style="left:48px;top:230px;width:120px;text-align:center;font-size:17px;line-height:1.3" data-s="0" data-d="3" data-a="up">context<br><span class="mut" style="font-size:15px">7 chars</span></div>
+    <div class="arrow" style="left:172px;top:262px;width:36px" data-s="0" data-d="3.8" data-a="grow"></div>
+    <div class="card" style="left:212px;top:200px;width:220px;height:120px;padding:14px" data-s="1" data-d="0" data-a="up" data-lit="1:0.1"><div class="mono blue" style="font-size:16px">feConvolveMatrix</div><div class="txt" style="font-size:17px;margin-top:8px">multiply-accumulate</div></div>
+    <div class="arrow" style="left:436px;top:262px;width:36px" data-s="1" data-d="1.0" data-a="grow"></div>
+    <div class="card" style="left:476px;top:200px;width:230px;height:120px;padding:14px" data-s="1" data-d="1.4" data-a="up" data-lit="1:1.6"><div class="mono blue" style="font-size:16px">feComponentTransfer</div><div class="txt" style="font-size:17px;margin-top:8px">ReLU lookup tables</div></div>
+    <div class="arrow" style="left:710px;top:262px;width:36px" data-s="1" data-d="2.6" data-a="grow"></div>
+    <div class="card" style="left:750px;top:200px;width:170px;height:120px;padding:14px" data-s="1" data-d="3.0" data-a="up" data-lit="1:3.2"><div class="mono blue" style="font-size:16px">feMorphology</div><div class="txt" style="font-size:17px;margin-top:8px">argmax</div></div>
+    <div class="arrow" style="left:924px;top:262px;width:36px" data-s="1" data-d="4.2" data-a="grow"></div>
+    <div class="card" style="left:964px;top:200px;width:268px;height:120px;padding:14px" data-s="1" data-d="4.6" data-a="up" data-lit="1:4.8"><div class="mono blue" style="font-size:16px">feDisplacementMap</div><div class="txt" style="font-size:16px;margin-top:8px">draws the answer</div></div>
+    <div class="mono mut" style="position:absolute;left:48px;top:380px;font-size:18px;line-height:1.7" data-s="2" data-a="up">your browser computes it<br><span class="gr">✓ bit-exact vs an integer reference</span><br><span class="gr">✓ recites 47 of 47 training sentences</span></div>
+    <div class="card" style="left:640px;top:370px;width:592px;height:190px;border-color:var(--yel)" data-s="3" data-a="up">
+      <div class="h3" style="color:var(--yel)">⚠️ Honest limits</div>
+      <div class="txt" style="margin-top:8px;font-size:19px">• correct only in Chrome, at 100% zoom, on a 1x display<br>• depth-2 limit: chaining deeper crashes the renderer</div>
+    </div>
+  </div>
+  <div class="abs" data-s="4" data-a="scale" style="left:48px;top:50px"><img src="latest.png" width="640" height="492" style="display:block;border-radius:0"></div>
+  <div class="abs" data-s="4" data-d="0.3" data-a="right" style="left:730px;top:130px;width:500px">
+    <div class="pill g" style="display:inline-block">live SVG filter network</div>
+    <div class="txt" style="margin-top:20px">shown at its natural size, 640×492</div>
+    <div class="txt mut" style="margin-top:10px">render ≈ 5 s</div>
+    <div class="txt mut" style="margin-top:10px">Chrome · 100% zoom · 1x display</div>
+  </div>
+  <div class="abs" data-s="4" data-d="1.5" data-a="up" style="left:730px;top:360px;width:500px"><span class="pill g">no Action needed to compute</span><div class="txt mut" style="margin-top:12px">just open the SVG</div></div>
+</section>
+
+<!-- 7 TRIED -->
+<section class="scene" id="sc-tried">
+  <div class="hdr" data-s="0"><h2>🧪 What we tried</h2></div>
+  <div class="abs" data-s="0" data-e="2" data-a="fade" style="left:0;top:0;width:1280px;height:620px">
+    <div class="mono mut abs" style="left:420px;top:110px;font-size:15px;width:760px;display:flex;justify-content:space-between"><span>0.1 s</span><span>1 s</span><span>10 s</span><span>100 s</span><span>1,000 s</span><span>10,000 s</span></div>
+    <div class="abs" style="left:420px;top:136px;width:760px;height:2px;background:var(--line)"></div>
+    <div class="abs txt" style="left:48px;top:160px;width:360px;font-size:19px" data-s="0" data-a="left">numpy engine in an Action<br><span class="mut mono" style="font-size:14px">measured: 0.2 s</span></div>
+    <div class="bar" style="left:420px;top:168px;width:46px;background:var(--orange)" data-s="0" data-a="grow"></div>
+    <div class="abs txt" style="left:48px;top:240px;width:360px;font-size:19px" data-s="0" data-d="1.5" data-a="left">XSLT in Chrome<br><span class="mut mono" style="font-size:14px">measured: 163 s</span></div>
+    <div class="bar" style="left:420px;top:248px;width:488px;background:var(--blue)" data-s="0" data-d="1.7" data-a="grow"></div>
+    <div class="abs pill r" style="left:930px;top:244px;font-size:14px" data-s="0" data-d="2.8" data-a="fade">removed 2026-11-17</div>
+    <div class="abs txt" style="left:48px;top:320px;width:360px;font-size:19px" data-s="1" data-d="0.3" data-a="left">Liquid in a Jekyll build<br><span class="mut mono" style="font-size:14px">measured: 17-22 min (exact)</span></div>
+    <div class="bar" style="left:420px;top:328px;width:623px;background:var(--blue)" data-s="1" data-d="0.5" data-a="grow"></div>
+    <div class="abs txt" style="left:48px;top:400px;width:360px;font-size:19px" data-s="1" data-d="2.8" data-a="left">CSS + variable fonts<br><span class="mut mono" style="font-size:14px">extrapolated: 11-65 min</span></div>
+    <div class="bar" style="left:420px;top:408px;width:581px;background:transparent;border:2.5px dashed var(--yel);border-right:none;border-radius:7px 0 0 7px" data-s="1" data-d="3.0" data-a="grow"></div>
+    <div class="bar" style="left:1001px;top:408px;width:112px;background:repeating-linear-gradient(45deg,#d2992255 0 6px,transparent 6px 12px);border:2.5px dashed var(--yel);border-left:none;border-radius:0 7px 7px 0" data-s="1" data-d="3.6" data-a="fade"></div>
+    <div class="abs mono mut" style="left:420px;top:480px;font-size:15px" data-s="1" data-d="4" data-a="fade">log scale · dashed = extrapolated</div>
+  </div>
+  <div class="abs" data-s="2" data-a="up" style="left:48px;top:100px;width:1184px">
+    <div class="h3">Why 8 bits is the crux for SVG filters</div>
+    <div class="mono mut" style="font-size:15px;margin-top:6px">share of QA answers exactly equal to the reference, by activation precision</div>
+    <div class="abs" style="left:0;top:90px;width:1184px;height:360px">
+      <div class="abs" style="left:60px;top:0;width:150px;height:300px;display:flex;align-items:flex-end"><div class="abs mono" style="top:-4px;width:150px;text-align:center;font-size:26px" data-s="2" data-d="1.0" data-a="fade">80.0%</div><div style="width:150px;height:240px;background:#8b949e;border-radius:8px 8px 0 0;transform-origin:bottom" data-s="2" data-d="0.3" data-a="growy"></div></div>
+      <div class="abs" style="left:290px;top:0;width:150px;height:300px;display:flex;align-items:flex-end"><div class="abs mono" style="top:-4px;width:150px;text-align:center;font-size:26px" data-s="2" data-d="1.4" data-a="fade">87.5%</div><div style="width:150px;height:262px;background:var(--blue);border-radius:8px 8px 0 0;transform-origin:bottom" data-s="2" data-d="0.7" data-a="growy"></div></div>
+      <div class="abs" style="left:520px;top:0;width:150px;height:300px;display:flex;align-items:flex-end"><div class="abs mono" style="top:-4px;width:150px;text-align:center;font-size:26px" data-s="2" data-d="2.2" data-a="fade">100%</div><div style="width:150px;height:300px;background:var(--green);border-radius:8px 8px 0 0;transform-origin:bottom" data-s="2" data-d="1.5" data-a="growy"></div></div>
+      <div class="abs mono mut" style="left:40px;top:312px;width:190px;text-align:center;font-size:15px">8-bit, filter noise</div>
+      <div class="abs mono mut" style="left:270px;top:312px;width:190px;text-align:center;font-size:15px">8-bit, no retraining</div>
+      <div class="abs mono mut" style="left:500px;top:312px;width:190px;text-align:center;font-size:15px">8-bit, retrained</div>
+      <div class="abs card" style="left:760px;top:40px;width:424px;height:210px" data-s="2" data-d="2.4" data-a="up"><div class="h3 blue">8-bit activations</div><div class="txt" style="margin-top:10px">are the crux: 87.5% without retraining, 100% retrained (698 questions)</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 DEPLOY -->
+<section class="scene" id="sc-deploy">
+  <div class="hdr" data-s="0"><h2>🚀 Deploy it yourself in 5 minutes</h2></div>
+  <div class="card step" style="left:48px;top:140px" data-s="1" data-a="up" data-lit="1">
+    <div class="n">1</div>
+    <div class="h3" style="margin-top:14px">Fork the repo</div>
+    <div class="term" style="margin-top:22px"><span class="mut">github.com/</span>Bobliuuu<span class="mut">/</span>readme-lm<br><br><span class="blue">[ Fork ]</span></div>
+  </div>
+  <div class="arrow" style="left:412px;top:300px;width:44px" data-s="2" data-a="grow"></div>
+  <div class="card step o" style="left:460px;top:140px" data-s="2" data-d="0.3" data-a="up" data-lit="2:0.4">
+    <div class="n" style="background:var(--orange2)">2</div>
+    <div class="h3" style="margin-top:14px">Run the deploy script</div>
+    <div class="term" style="margin-top:22px"><span class="gr">$</span> scripts/deploy.sh</div>
+    <div class="mono mut" style="font-size:15px;line-height:1.7;margin-top:14px"><span class="gr" data-s="2" data-d="1.2" data-a="fade">✓</span> your profile repo<br><span class="gr" data-s="2" data-d="1.9" data-a="fade">✓</span> a write deploy key<br><span class="gr" data-s="2" data-d="2.6" data-a="fade">✓</span> the secret</div>
+  </div>
+  <div class="arrow" style="left:824px;top:300px;width:44px" data-s="3" data-a="grow"></div>
+  <div class="card step g" style="left:872px;top:140px" data-s="3" data-d="0.3" data-a="up" data-lit="3:0.4">
+    <div class="n" style="background:var(--green)">3</div>
+    <div class="h3" style="margin-top:14px">Open an issue</div>
+    <div class="term" style="margin-top:22px;min-height:50px" data-type="3" data-d="0.6" data-text="qa: example text"></div>
+    <div class="txt" style="margin-top:20px;font-size:18px" data-s="3" data-d="2.2" data-a="fade">…and watch your profile animation change ✨</div>
+  </div>
+  <div class="abs mono mut" style="left:48px;top:520px;font-size:16px" data-s="1" data-a="fade">three steps, about five minutes</div>
+</section>
+
+<!-- 9 OUTRO -->
+<section class="scene" id="sc-outro">
+  <div class="abs title-grad" data-s="0" data-a="scale" style="left:0;width:1280px;top:130px;text-align:center;font-size:64px;font-weight:800;letter-spacing:-2px">README-LM</div>
+  <div class="abs" data-s="0" data-d="0.3" data-a="up" style="left:140px;width:1000px;top:260px;text-align:center;font-size:38px;font-weight:600;line-height:1.35">A README <span class="rd">can't</span> compute, but it can carry a whole model, and some renderers will <span class="gr">compute it for you</span>.</div>
+  <div class="abs mono" data-s="1" data-a="up" style="left:0;width:1280px;top:470px;text-align:center;font-size:34px;color:var(--blue)">github.com/Bobliuuu/readme-lm</div>
+</section>
+
+<div id="prog"></div>
+<div id="cap"></div>
+</div>
+<script src="scenes.js"></script>
+</body></html>

@@ -1,36 +1,94 @@
-# README-LM
+# 🧠 README-LM
 
-**Language models stored as Markdown, and how far a document renderer can go toward running them.**
+### A language model that lives in a README 📜➡️🤖
 
-<div align="center"><img src="docs/img/gpt2-generation.gif" alt="Animation: real GPT-2 generating text one token at a time, with its top-3 next-token probabilities at each step" width="720"></div>
+<div align="center">
 
-<sub>Real GPT-2 small, run from Markdown files, generating a reply token by token (replayed from an actual run: each frame is one token and GPT-2's top-3 candidates).</sub>
+<a href="docs/video/explainer.mp4"><img src="docs/video/poster.png" alt="Watch the README-LM explainer video" width="760"></a>
 
-A README is a static document, so "a language model in a README" has to be answered in layers: where do the weights live, and **who does the arithmetic?** This repo ships two answers and records what we learned trying the rest.
+▶️ **[Watch the explainer video](docs/video/explainer.mp4)** (GitHub plays it right on that page)
 
-| | **A. The fast one** (what the profile README runs) | **B. The pure-markup one** (no Action, no JavaScript, no runtime of ours) |
-|---|---|---|
-| Models | real GPT-2 small (124M, int8) and a 600K-parameter QA transformer that knows my GitHub | a toy neural net computed by GitHub's own renderer (works, verified live); an SVG-filter version (every op exact in Chrome; the chained model does not render as one image) |
-| Weights live in | Markdown shards (`gpt2/`, `qa/weights.md`) and the profile README | the page itself |
-| Arithmetic done by | a numpy engine that is extracted from a Markdown document and run by a GitHub Action | GitHub's MediaWiki renderer evaluating `{{#expr}}` / the viewer's browser rendering an SVG filter graph |
-| Speed | seconds to minutes per reply | instant to render; tiny models only |
-| Try it | [`gpt2:` / `qa:` issues](#try-it) | [the MediaWiki net](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) |
+</div>
 
-## Try it
+## ✨ The idea in one minute
+
+A README is a static document: it can't run code. So "a language model in a README" really asks one question: **who does the arithmetic?** We built three answers, from a tiny engine on a GitHub Action all the way down to **no Action at all**.
+
+<div align="center"><img src="docs/img/arch-three-versions.svg" alt="The three versions: A normal (minimal Action), B pure MediaWiki, C pure SVG" width="860"></div>
+
+| | 🟠 **A · Normal** | 🟢 **B · Pure MediaWiki** | 🟢 **C · Pure SVG** |
+|---|---|---|---|
+| **What it is** | real **GPT-2 small** (124M, int8) and a **600K QA model** that knows my repos | a **neural net written as MediaWiki formulas** | a **neural net drawn as SVG filters** |
+| **Weights live in** | Markdown files (`gpt2/`), and inside the profile README itself (QA, 417 KiB) | the page itself | the SVG itself |
+| **Who computes** | a ~150-line engine **inside a Markdown document**, run by one line of Python on a GitHub Action | **GitHub's own renderer** evaluates every `{{#expr}}` | **your browser's filter engine** |
+| **Needs an Action?** | yes, a minimal one | **no**: just open the page | **no**: just open the SVG |
+| **Honest scope** | real models; a minute or a few per reply | a toy (2-character context, 12 units) | a toy (7-character context, 224 units); Chrome at 100% zoom on a 1x display |
+| **Try it** | [`gpt2:`](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+example+text) · [`qa:`](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+example+text) | [`mediawiki:`](https://github.com/Bobliuuu/readme-lm/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text) · [open the page](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki) | [`svg:`](https://github.com/Bobliuuu/readme-lm/issues/new?template=svg.md&title=svg%3A+example+text) · [see it live below](#-version-c-pure-svg-no-code-your-browser-computes) |
+
+> 💡 In this live repo an Action also takes the text you type for B and C: it writes your text into the page or the SVG, then reads the result back to animate the profile. The computation itself is done by GitHub's renderer or by your browser, so you can open the page or the SVG with **no Action running at all**.
+
+## 🕹️ Try it now
 
 Open an issue in this repo and replace `example text` in the title with anything you like. An Action runs the model and rewrites the animation at the top of [github.com/Bobliuuu](https://github.com/Bobliuuu):
 
-- **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+example+text).
-- **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+example+text). Anything off-topic gets a refusal.
-- **`mediawiki:`** a toy neural net that GitHub's own MediaWiki renderer computes: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text). The latest generated page is [here](https://github.com/Bobliuuu/Bobliuuu/blob/main/demos/mediawiki/README.mediawiki); the original, with a worked example, is [trackD/mediawiki](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki).
-- **Click through precomputed models:** [GPT-2 graphs](graph/gpt2/README.md), [QA graph](graph/qa/README.md), or the [character model at the bottom of this file](#s-the).
-- **Run the executable document yourself:** `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
+- 🟠 **`gpt2:`** real GPT-2 small continues your text: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+example+text).
+- 🟠 **`qa:`** the 600K-parameter model that knows my GitHub (its weights live inside the profile README): [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+example+text). Anything off-topic gets a refusal.
+- 🟢 **`mediawiki:`** GitHub's own MediaWiki renderer computes a tiny neural net on your text: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=mediawiki.md&title=mediawiki%3A+example+text).
+- 🟢 **`svg:`** an SVG filter network continues your text, every character computed by Chrome's filter engine: [open one](https://github.com/Bobliuuu/readme-lm/issues/new?template=svg.md&title=svg%3A+example+text) (try `jerry w`).
+- 🔗 **No-Action extras:** [GPT-2 link graphs](graph/gpt2/README.md), [QA link graph](graph/qa/README.md), the [character model at the bottom of this file](#s-the), or run the executable document yourself: `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
 
-The live animation (the profile's `assets/readme-lm.svg`, rewritten by the Action on every issue):
+The live animation (the profile's `assets/readme-lm.svg`, rewritten on every issue):
 
 <div align="center"><img src="https://raw.githubusercontent.com/Bobliuuu/Bobliuuu/main/assets/readme-lm.svg" alt="The profile's animation: the latest answer from the latest issue" width="640"></div>
 
-## Architecture
+## 🟠 Version A: normal GPT-2 and QA on a minimal Action
+
+<div align="center"><img src="docs/img/gpt2-generation.gif" alt="Real GPT-2 generating text one token at a time, with its top-3 next-token probabilities" width="720"></div>
+
+<sub>Real GPT-2 small run from Markdown files, replayed from an actual run: each frame is one token and GPT-2's top-3 candidates.</sub>
+
+The weights are Markdown (GPT-2 as 339 shards of base64 text, about 112 MB; the QA model as one block inside the profile README). The *engine* is also Markdown: one document that carries the interpreter source, the forward-pass program and the run request. All an Action does is run one line of Python that extracts the engine from the document and executes it. ([How it works](#the-document-is-the-program); the diagrams are in Architecture below.)
+
+## 🟢 Version B: pure MediaWiki, no Action to compute
+
+GitHub renders `.mediawiki` files. We wrote a neural net as MediaWiki formulas, so **GitHub's own renderer does every multiply-accumulate when the page loads**. This is one ReLU unit, straight from the page (`ifeq` on a comparison gives `a-b` when positive, else `0`):
+
+```
+{{#ifeq:{{#expr:6*7+2*3+2*2+3*4 > 2*7+3*7+7*4+2*7+7*7+7}}|1|{{#expr:6*7+2*3+2*2+3*4-(2*7+3*7+7*4+2*7+7*7+7)}}|0}}
+```
+
+<div align="center"><img src="docs/img/mediawiki-render.png" alt="The MediaWiki page as GitHub renders it: a table whose live column is computed by the renderer" width="620"></div>
+
+<sub>The page as GitHub renders it (HTML from GitHub's API, shown with plain styling): the "live (renderer)" column is computed by GitHub and matches the numpy reference. Verified 40/40 on GitHub's production renderer.</sub>
+
+It is a toy (2-character context, 12 hidden units, trained on 194 characters): MediaWiki on GitHub has no variables or loops, so every intermediate value is written out inline (311 KB for 40 rows). [Open the page](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) · [report](trackD/mediawiki/REPORT.md).
+
+## 🟢 Version C: pure SVG, no code, your browser computes
+
+The picture below is **not an image of a computation: it is the computation**. A 7-character-context, 224-unit neural net is written as SVG filter primitives: `feConvolveMatrix` does the multiply-accumulates, `feComponentTransfer` tables do the ReLU, `feMorphology` takes the argmax and `feDisplacementMap` draws the answer. Your browser's filter engine evaluates it as the page loads.
+
+<div align="center">
+<img src="demos/svg/latest.svg" alt="Live SVG filter network computed by your browser" width="640">
+<img src="docs/img/svg-net-reference.png" alt="Reference render of the same SVG network (Chrome, 1x)" width="640">
+</div>
+
+<sub>Top: the live network (blue = what the filters predicted, white = the actual next character). Bottom: a reference render from Chrome at 1x. ⚠️ Filters run at device pixels: on a Retina display, a zoomed page or a narrow phone the live one will look wrong, and the reference shows what it should compute.</sub>
+
+It recites all 47 of its training sentences exactly and is bit-exact against an integer reference. It can't be chained deeper than two layers (the renderer crashes), so it spends its parameters on width and context. [Report](demos/svg/REPORT.md).
+
+## 🚀 Deploy it yourself
+
+Run README-LM on your own GitHub profile in about 5 minutes. Needs the [`gh` CLI](https://cli.github.com) (logged in), `git`, and `python3` with `numpy`.
+
+```bash
+gh repo fork Bobliuuu/readme-lm --clone && cd readme-lm
+scripts/deploy.sh --dry-run   # preview every command, writes nothing
+scripts/deploy.sh             # forks, sets up YOU/YOU, deploy key, secret; asks before each write
+```
+
+Then open the issue link it prints (`qa:`, `gpt2:`, `mediawiki:` or `svg:`) and your profile animation updates in about a minute. Full guide, customization and troubleshooting: [DEPLOY.md](DEPLOY.md). Remove it again with `scripts/undeploy.sh`.
+
+## 🏗️ Architecture
 
 ### The fast version, end to end
 
@@ -50,7 +108,7 @@ The live animation (the profile's `assets/readme-lm.svg`, rewritten by the Actio
 
 ![How the pure-markup MediaWiki net works](docs/img/arch-mediawiki-net.svg)
 
-## What we tried
+## 🔬 What we tried
 
 The goal was to push the arithmetic into the renderer as far as possible. Each substrate was built and checked by a separate probe (reports in [`trackB/`](trackB/PROBE.md), [`trackC/`](trackC/README.md), [`trackD/`](trackD/)); times marked "extrapolated" are projected from measured throughput, not measured end to end.
 
@@ -83,7 +141,7 @@ A graph can only contain continuations that were compiled. Confident prompts com
 
 ![QA click-graph size for 701 questions](docs/img/qa-graph-compression.svg)
 
-## How each piece works
+## 🧩 How each piece works
 
 ### The QA model (inside a README)
 
@@ -132,7 +190,7 @@ GitHub stops rendering a README at 500 KiB, which limits this approach: states g
 | 4 chars (top-4, p>=8%) | 531,441 | 9,309 | 744 KiB | 4.8 | no |
 | 5 chars (top-3, p>=15%) | 14,348,907 | 10,066 | 688 KiB | 5.4 | no |
 
-## Honest limits
+## ⚠️ Honest limits
 
 - The two shipped versions are not the same thing. The fast version computes outside GitHub's renderer, on a GitHub-hosted runner. The pure-markup version computes inside GitHub's renderer, but only as a toy.
 - No substrate we tried runs a GPT-2-sized model inside a README. GitHub's renderer has no input-dependent arithmetic, so anything computed there is a fixed function of the file.
@@ -141,11 +199,11 @@ GitHub stops rendering a README at 500 KiB, which limits this approach: states g
 - The SVG-filter version is not shipped: its ops are exact, but the chained model does not render in Chrome (see above).
 - Probe results come from local emulation of GitHub's renderers unless a report says it was checked on github.com.
 
-## Credits
+## 🙏 Credits
 
 Inspired by Shubham Patil's [GPT-2 in pure CSS](https://gpt2css.shubhampatil.dev) ([blog post](https://shubhampatil.dev/blog/gpt2-css)), which computes in the browser, and by a reported GPT-2 in pdfLaTeX. This project differs in storing the weights as Markdown and in asking how much of the arithmetic a document renderer can do.
 
-## Reproduce
+## 🔁 Reproduce
 
 ```
 pip install torch numpy regex
@@ -170,7 +228,7 @@ python3 trackD/mediawiki/gen_mediawiki.py && python3 trackD/mediawiki/check.py
 python3 build.py 3 5 0.04 100000 && python3 compose.py
 ```
 
-## File map
+## 🗂️ File map
 
 | Path | Purpose |
 |---|---|

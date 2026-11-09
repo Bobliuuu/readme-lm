@@ -176,5 +176,22 @@ def fig_diagrams():
           ["GitHub's renderer\nevaluates every\nexpression at render time", "table: predicted next\ncharacter per input\ncontext, live", "check_live.py compares\nwith a python reference:\n40/40 exact"]],
          hl={(1, 0)})
 
+
+def fig_three_versions():
+    W, H = 860, 340; cw = (W - 48 - 2 * 20) / 3
+    cards = [("A", "Normal", "NEEDS A MINIMAL ACTION", 0, ["real GPT-2 (124M) + a 600K QA model", "weights are Markdown files", "the engine is one Markdown document", "plus one line of Python on an Action", "", "issue  ->  Action  ->  animation"]),
+             ("B", "Pure MediaWiki", "NO ACTION TO COMPUTE", 1, ["a MediaWiki page of {{#expr}} formulas", "GitHub's own renderer does the math", "verified 40/40 vs a Python reference", "a toy: 2-char context, 12 units", "", "just open the page"]),
+             ("C", "Pure SVG", "NO ACTION TO COMPUTE", 1, ["a neural net drawn as SVG filters", "your browser's filter engine computes", "224 ReLU units, bit-exact, no code", "Chrome, 100% zoom, 1x display", "", "just open the SVG"])]
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="The three versions of README-LM"><title>The three versions of README-LM</title><style>{DCSS}:root{{--g:#1a7f37}}@media (prefers-color-scheme: dark){{:root{{--g:#3fb950}}}} .gs{{stroke:var(--g);stroke-width:2}} .os{{stroke:var(--c2);stroke-width:2}} .gf{{fill:var(--g)}} .of{{fill:var(--c2)}} .wt{{fill:#fff;font-weight:700}}</style><rect class="bg" width="{W}" height="{H}" rx="10"/>',
+         '<text class="ttl" x="24" y="32" font-size="16">Three versions, one idea: how much of the arithmetic can a document renderer do?</text>',
+         '<text class="t2" x="24" y="52" font-size="12">In the live repo an Action also takes your typed text for B and C; opening the page or the SVG itself needs no Action.</text>']
+    for i, (tag, name, badge, green, lines) in enumerate(cards):
+        x = 24 + i * (cw + 20); st = "gs" if green else "os"; fl = "gf" if green else "of"
+        o.append(f'<rect class="node {st}" x="{x:.1f}" y="72" width="{cw:.1f}" height="246" rx="12"/>')
+        o.append(f'<rect class="{fl}" x="{x+14:.1f}" y="86" width="{cw-28:.1f}" height="24" rx="12"/><text class="wt" x="{x+cw/2:.1f}" y="103" font-size="11" text-anchor="middle">{badge}</text>')
+        o.append(f'<text class="ttl" x="{x+16:.1f}" y="140" font-size="20">{tag} · {escape(name)}</text>')
+        for k, t in enumerate(lines): o.append(f'<text x="{x+16:.1f}" y="{170+k*22}" font-size="12.5"{" font-weight=\"600\"" if k==len(lines)-1 else ""}>{escape(t)}</text>')
+    save("arch-three-versions.svg", "".join(o))
+
 if __name__ == "__main__":
-    fig_time(); fig_precision(); fig_coverage(); fig_compress(); fig_diagrams(); gif()
+    fig_time(); fig_precision(); fig_coverage(); fig_compress(); fig_diagrams(); fig_three_versions(); gif()
