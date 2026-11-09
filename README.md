@@ -46,6 +46,10 @@ Limits:
 
 ## 2. GPT-2 small in Markdown
 
+<div align="center"><img src="gpt2/latest.svg?v=0" alt="Typing animation of the latest GPT-2 output" width="640"></div>
+
+The animation above is the latest generation, refreshed by the Action each time an issue titled `gpt2: ...` is opened.
+
 GPT-2 small does not fit in one README: 124M parameters is far more than 500 KiB. So the weights are sharded across Markdown files in this repo, and the computation happens in a GitHub Action runner, not in the README and not in your browser.
 
 - `gpt2/weights/part-*.md`: 339 files, each a fenced block of base64(zlib(int8)), about 112 MB in total.
