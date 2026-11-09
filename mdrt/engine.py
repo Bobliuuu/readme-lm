@@ -131,11 +131,14 @@ def main():
             else: kk = np.argsort(-logits)[:k]; q = np.exp((logits[kk] - logits[kk].max()) / T); q /= q.sum(); t = int(rng.choice(kk, p=q))
             if t == 50256: break
             rows.append((step, t, float(p[t]), [(tok.decode([int(i)]), float(p[i])) for i in top])); ids = ids + [t]
-        esc = lambda s: s.replace(chr(10), "⏎").replace("|", "/")
+        esc = lambda s: s.replace(chr(10), "⏎").replace("|", "/").replace(chr(96), chr(39))
         tbl = "\n".join(f"| {i} | `{esc(tok.decode([t]))}` | {pt*100:.1f}% | " + " · ".join(f"`{esc(s)}` {q*100:.0f}%" for s, q in tp) + " |" for i, t, pt, tp in rows)
-        out = tok.decode(ids)
+        out = tok.decode(ids).replace(chr(96), chr(39))
         return (f"**Prompt:** {prompt}\n\n**Generated ({len(rows)} tokens, temperature {T}):**\n\n> {out.replace(chr(10), ' ⏎ ')}\n\n| step | chosen token | p | top-3 |\n|---|---|---|---|\n{tbl}\n")
-    rendered = re.sub(FENCE + r"mdrt-run\n(.*?)\n" + FENCE, lambda m: run_block(m), md, flags=re.S)
+    outs = []
+    def sub(m): s = run_block(m); outs.append(s); return s
+    rendered = re.sub(FENCE + r"mdrt-run\n(.*?)\n" + FENCE, sub, md, flags=re.S)
+    text = "\n\n".join(outs) if "--run-only" in sys.argv else rendered
     out = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else None
-    open(out, "w").write(rendered) if out else print(rendered)
+    open(out, "w").write(text) if out else print(text)
 main()

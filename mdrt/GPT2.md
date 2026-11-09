@@ -2,18 +2,18 @@
 
 This file carries everything needed to run GPT-2 small (124M parameters) except a Python interpreter:
 
-1. **The engine** (below): about 150 lines of Python: Markdown shard reader, GPT-2 byte-level BPE tokenizer, the tensor ops, and an interpreter for the declarative program.
+1. **The engine** (below): Markdown shard reader, GPT-2 byte-level BPE tokenizer, the tensor ops, and an interpreter for the declarative program.
 2. **The weights and tokenizer**, referenced from Markdown shards (`../gpt2/*.md`, int8 + base64 + zlib, 112 MB in 341 files).
 3. **The model**: the forward pass written as a declarative program (below).
 4. **A run request** (below).
 
-**Bootstrap** (the only thing that is not in this file; the engine is extracted from this very document and executed):
+**Bootstrap** (the only thing not in this file; the engine is extracted from this very document and executed):
 
 ```sh
 python3 -c "import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+'python mdrt-engine\\n(.*?)\\n'+chr(96)*4,t,re.S).group(1))" GPT2.md
 ```
 
-Needs `numpy` and `regex`. Add `-o OUT.md` to write the rendered document (the run block replaced by the generated tokens and a top-3 table) to a file instead of stdout.
+Needs `numpy` and `regex`. Flags: `-o OUT.md` writes the rendered document to a file; `--run-only` outputs only the rendered run block (prompt, generated text, per-token top-3 table).
 
 GitHub's renderer only *displays* this document. The computation is done by the engine extracted from it, so this is Markdown as the complete artifact (weights, architecture, interpreter, request), not Markdown executing itself.
 
@@ -50,7 +50,7 @@ logits = head(x, wte)
 ```mdrt-run
 prompt: The meaning of life is
 tokens: 24
-temperature: 0
+temperature: 0.8
 top_k: 40
 seed: 0
 ```
@@ -191,12 +191,15 @@ def main():
             else: kk = np.argsort(-logits)[:k]; q = np.exp((logits[kk] - logits[kk].max()) / T); q /= q.sum(); t = int(rng.choice(kk, p=q))
             if t == 50256: break
             rows.append((step, t, float(p[t]), [(tok.decode([int(i)]), float(p[i])) for i in top])); ids = ids + [t]
-        esc = lambda s: s.replace(chr(10), "⏎").replace("|", "/")
+        esc = lambda s: s.replace(chr(10), "⏎").replace("|", "/").replace(chr(96), chr(39))
         tbl = "\n".join(f"| {i} | `{esc(tok.decode([t]))}` | {pt*100:.1f}% | " + " · ".join(f"`{esc(s)}` {q*100:.0f}%" for s, q in tp) + " |" for i, t, pt, tp in rows)
-        out = tok.decode(ids)
+        out = tok.decode(ids).replace(chr(96), chr(39))
         return (f"**Prompt:** {prompt}\n\n**Generated ({len(rows)} tokens, temperature {T}):**\n\n> {out.replace(chr(10), ' ⏎ ')}\n\n| step | chosen token | p | top-3 |\n|---|---|---|---|\n{tbl}\n")
-    rendered = re.sub(FENCE + r"mdrt-run\n(.*?)\n" + FENCE, lambda m: run_block(m), md, flags=re.S)
+    outs = []
+    def sub(m): s = run_block(m); outs.append(s); return s
+    rendered = re.sub(FENCE + r"mdrt-run\n(.*?)\n" + FENCE, sub, md, flags=re.S)
+    text = "\n\n".join(outs) if "--run-only" in sys.argv else rendered
     out = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else None
-    open(out, "w").write(rendered) if out else print(rendered)
+    open(out, "w").write(text) if out else print(text)
 main()
 ````

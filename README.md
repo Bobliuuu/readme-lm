@@ -5,10 +5,21 @@ Language models stored as Markdown. This repo holds three different things, with
 | | What | Weights live in | Compute runs in | Try it |
 |---|---|---|---|---|
 | 1. QA model | 600K-param char-level transformer that answers questions about my public repos | inside the README of my profile repo, [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu) (417 KiB total, under GitHub's 500 KiB render limit) | a GitHub Action in the profile repo, numpy | open an issue titled `ask: <question>` on the profile repo |
-| 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo, numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
+| 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo (`mdrt/GPT2.md`), numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
 | 3. Clickable model | char-level MLP (3-character context, 92K params) compiled into 2,622 Markdown states | this README, as links | nowhere: no Action, no JavaScript, you click | [start here](#s-the) |
 | 4. Compiled link graphs | real GPT-2 (12 prompts) and the QA transformer (687 questions), as click-through pages in `graph/` | `graph/*.md` | nowhere: no Action, no JavaScript, you click precomputed predictions | [GPT-2 graphs](graph/gpt2/README.md) · [QA graph](graph/qa/README.md) |
 | 5. Self-contained executable Markdown | one `.md` document carrying the engine source, the forward-pass program and a run request; weights by reference | `gpt2/*.md` shards | the engine extracted from the document, run by one line of Python | [`mdrt/GPT2.md`](mdrt/GPT2.md) |
+
+## Try it: `gpt2:` or `qa:`
+
+Open an issue and put the mode in the title:
+
+- [`gpt2: The meaning of life is`](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is): real GPT-2 small continues your text.
+- [`qa: what is qwentpu`](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+what+is+qwentpu): the 600K-parameter model that knows my public repos answers a question.
+
+A GitHub Action runs the matching executable Markdown document (`mdrt/GPT2.md` or `mdrt/QA.md`: engine source, forward-pass program, tokenizer and weights all live in Markdown), replies with the Markdown that document produced, and shows an animation of the result. Latest QA result:
+
+<div align="center"><img src="qa/latest.svg?v=0" alt="Typing animation of the latest QA answer" width="640"></div>
 
 ## 4. Compiled link graphs (`graph/`)
 
@@ -57,7 +68,7 @@ GPT-2 small does not fit in one README: 124M parameters is far more than 500 KiB
 - `gpt2/manifest.md`: the tensor table (names, shapes, quantization layout).
 - `gpt2/run.py`: a numpy-only GPT-2 forward pass with a KV cache and a pure-Python byte-level BPE (needs `numpy` and `regex`). It reads the shards directly. On a laptop CPU, loading takes about 3 s and generation about 0.25 s per token.
 - Quantization: int8 per output channel. On a 44-token test passage, perplexity was 13.5 (int8) versus 13.4 (fp32), and top-1 next-token agreement was 38/44. That is a small test, not a benchmark.
-- Workflow `.github/workflows/gpt2.yml` answers issues titled `gpt2: <anything>`. If the title ends in `?` it is turned into `Question: ... Answer:`. The Action replies with the output and closes the issue. The issue template `.github/ISSUE_TEMPLATE/gpt2.md` opens the form. A click-link looks like `https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is`.
+- Workflow `.github/workflows/ask.yml` answers issues titled `gpt2: <text>` or `qa: <question>`. It writes the issue text into the run block of the matching executable document (`mdrt/GPT2.md` or `mdrt/QA.md`), runs the document (engine, program, tokenizer and weights all come from Markdown), then replies with the Markdown that document produced plus a typing animation, and closes the issue. The workflow itself only does I/O. The `gpt2:` reply samples 40 tokens at temperature 0.8.
 
 Limits: GPT-2 is a base language model, not a chat assistant. It continues text, and the output can be wrong, repetitive or odd. Each reply takes however long an Action run takes.
 
@@ -119,7 +130,7 @@ python3 compose.py                     # link validation + render
 | `export_qa.py` | pack int4 weights into a README between markers |
 | `qa_infer.py`, `ask.py`, `gen.py` | numpy inference with KV cache; answer and animated SVG |
 | `gpt2/` | GPT-2 shards (`weights/`, `tokenizer/`), `manifest.md`, `run.py`, `convert.py` |
-| `.github/workflows/gpt2.yml`, `.github/ISSUE_TEMPLATE/gpt2.md` | the `gpt2:` issue workflow and form |
+| `.github/workflows/ask.yml`, `.github/ISSUE_TEMPLATE/*.md` | the `gpt2:` and `qa:` issue workflow and forms |
 | `build.py`, `compose.py` | compile and validate the clickable model |
 
 ## Compiled model (2,622 states)
