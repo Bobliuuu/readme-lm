@@ -2,9 +2,8 @@
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=x=>1-Math.pow(1-x,3);
 let SC=[], CFG=null, GIF=[], LIVE=[];
-// real captured frames of the issue flow: [file, sentence index, offset (s), elapsed label, caption]
-const LIVE_META=[[0,0,0.1,'before Create','Scroll to "Try it now"'],[1,0,0.9,'before Create','Click the qa: link: form opens prefilled'],[2,0,1.7,'before Create','Title edited'],[3,0,2.5,'+1 s','Create clicked'],
- [4,0,3.3,'+19 s','Workflow run: in progress'],[5,1,0.0,'+35 s','Bot answered, issue closed'],[6,1,1.0,'+41 s','The answer, in the issue'],[7,1,2.4,'+105 s','Profile: image cache still old'],[8,1,3.6,'+391 s','Profile: new answer typing'],[9,1,4.8,'+399 s','Profile: full new answer']];
+// screen recording frames at 12 fps, played 4x; Create clicked about 16.5 s into the recording
+const LIVE_FPS=12, LIVE_SPEED=4, LIVE_CREATE=16.5;
 const WIKI=`{{#switch:{{#expr:5*{{#ifeq:{{#expr:<b>6*7+2*4+2*7+7*7+2*2+3*4</b>><b>2*1+3*2+7*2+4*3+7</b>}}|1|{{#expr:6*7+2*4+2*7+7*7+2*2+3*4-(2*1+3*2+7*2+4*3+7)}}|0}}+5*{{#ifeq:{{#expr:7*5+6*3+3*7+1*7+3*2>2*1+1*2+3*2+5*4+7*7+1*3+3*4+7}}|1|{{#expr:7*5+6*3+3*7+1*7+3*2-(2*1+1*2+3*2+5*4+7*7+1*3+3*4+7)}}|0}}+5*{{#ifeq:{{#expr:4*1+2*5+6*2+3*7+7*3+7*2>5*3+5*2+7*7+3*4+7*7+9}}|1|{{#expr:4*1+2*5+6*2+3*7+7*3+7*2-(5*3+5*2+7*7+3*4+7*7+9)}}|0}}+7*{{#ifeq:{{#expr:5*1+2*2+3*7+7*3+7*2>6*5+7*3+1*2+7*7+6*4+7*7+7*4+3}}…`;
 // predictions of the real 2-char net (computed with demos/mediawiki/gen.py ref_forward) for the text "hello there"
 const ROWS=[["he","␣"],["el","␣"],["ll","t"],["lo","t"],["o␣","t"],["␣t","h"],["th","e"],["he","␣"],["er","y"],["re","␣"]];
@@ -24,7 +23,7 @@ async function init(cfg){
   const box=document.getElementById('gifbox');
   for(const u of cfg.gifFrames){const im=new Image();im.src=u;await im.decode();im.style.cssText='position:absolute;left:0;top:0;display:none';box.appendChild(im);GIF.push(im);}
   const lbox=document.getElementById('livebox');
-  for(const u of (cfg.liveFrames||[])){const im=new Image();im.src=u;await im.decode();im.style.cssText='position:absolute;left:0;top:0;width:800px;height:413px;display:none';lbox.appendChild(im);LIVE.push(im);}
+  for(const u of (cfg.liveFrames||[])){const im=new Image();im.src=u;await im.decode();im.style.cssText='position:absolute;left:0;top:0;width:528px;height:523px;display:none';lbox.appendChild(im);LIVE.push(im);}
   document.querySelectorAll('img').forEach(i=>i.decode&&i.decode());
   cfg.scenes.forEach(s=>{
     const el=document.getElementById('sc-'+s.id);
@@ -61,10 +60,10 @@ function setT(t){
   sc.strikes.forEach(s=>{s.e.style.setProperty('--k',ease(clamp((lt-st[s.s]-s.d)/0.4)))});
   if(sc.id==='title'){document.querySelectorAll('[data-tok]').forEach(e=>{const i=+e.dataset.tok;const ph=(lt*6-i*0.9);e.classList.toggle('lit',ph>0&&ph%24<3)});}
   if(sc.id==='a'&&GIF.length){const g=st[4]+1.0;if(lt>=g){const i=Math.floor((lt-g)*2.38*2.0)%GIF.length;GIF.forEach((im,j)=>im.style.display=j===i?'block':'none');}}
-  if(sc.id==='live'&&LIVE.length){let cur=-1;LIVE_META.forEach((m,k)=>{if(lt>=st[m[1]]+m[2])cur=k;});
-    LIVE.forEach((im,j)=>im.style.display=(cur>=0&&j===cur)?'block':'none');
-    if(cur>=0){document.getElementById('livet').textContent=LIVE_META[cur][3];document.getElementById('livecap').textContent=LIVE_META[cur][4];}
-    else{document.getElementById('livet').textContent='before Create';document.getElementById('livecap').textContent='';}}
+  if(sc.id==='live'&&LIVE.length){const src=clamp((lt-st[0]-0.2)*LIVE_SPEED,0,LIVE.length/LIVE_FPS-0.1);const cur=Math.floor(src*LIVE_FPS);
+    if(LIVE.prev!==undefined&&LIVE[LIVE.prev])LIVE[LIVE.prev].style.display='none';LIVE[cur].style.display='block';LIVE.prev=cur;
+    const el=src-LIVE_CREATE;document.getElementById('livet').textContent=el<0?'before Create':'+'+Math.round(el)+' s';
+    document.getElementById('livecap').textContent=el<0?(src<2?'Click the qa: link in the README':'Form open: edit the title, then Create'):(el<18?'Issue created, Action running':(el<26?'Bot answered':'The answer, in the issue'));}
   // captions
   const cap=document.getElementById('cap');let ci=-1;
   for(let i=0;i<st.length;i++){if(lt>=st[i]-0.05&&lt<sc.ends[i]+0.2)ci=i;}

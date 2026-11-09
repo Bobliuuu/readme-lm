@@ -109,14 +109,19 @@
  },
  {
   "id": "live",
-  "onscreen": "Live demo, real recording of issue #12 (qa: what is jerry building): click the README link, the form opens prefilled, Create; about 35 s later the Action has answered and closed the issue; after GitHub's image cache refreshes (about 6.5 min here) the profile animation shows the new answer. Elapsed-seconds counter from real screenshot timestamps",
+  "onscreen": "Live demo, a real screen recording of issue #15 (qa: what is jerry building) sped up 4x: click the README link, the form opens prefilled, Create; about 25 s later the Action has answered and closed the issue. The counter shows real seconds after Create",
   "sents": [
    {
-    "cap": "Here is the real thing: click the link, the form opens prefilled, and submit."
+    "cap": "Here is the real thing, a screen recording sped up four times. Click the link, and the form opens prefilled."
    },
    {
-    "cap": "About thirty-five seconds later the Action has answered. The profile animation follows once GitHub's image cache refreshes.",
-    "tts": "About thirty-five seconds later the Action has answered. The profile animation follows once GitHub's image cache refreshes."
+    "cap": "Change the question, hit create, and the Action starts running."
+   },
+   {
+    "cap": "About twenty-five seconds later it has answered in the issue, and closed it."
+   },
+   {
+    "cap": "That answer comes from the model stored in the profile README. A real answer, if not a good one."
    }
   ]
  },

@@ -49,9 +49,9 @@ gif = sorted(os.listdir(f"{tmp}/gif"))
 # work dir for the page: scenes + assets side by side
 page = f"{tmp}/page"; os.makedirs(page)
 for f in ("scenes.html", "scenes.css", "scenes.js"): shutil.copy(os.path.join(HERE, f), page)
-LF = ["02","03","04","05","09","12","13","14","15","16"]
 os.makedirs(f"{page}/live")
-for f in LF: shutil.copy(os.path.join(ROOT, "docs", "gifs", "issue-flow-frames", f + ".jpg"), f"{page}/live/{f}.jpg")
+sh("ffmpeg", "-loglevel", "error", "-y", "-t", "70", "-i", os.path.join(ROOT, "docs", "gifs", "issue-flow.mp4"), "-vf", "crop=954:945:0:135,scale=528:523,fps=12", "-q:v", "3", f"{page}/live/%04d.jpg")
+LF = sorted(f[:-4] for f in os.listdir(f"{page}/live"))
 shutil.copy(f"{tmp}/latest.png", page); shutil.copytree(f"{tmp}/gif", f"{page}/gif")
 
 # 4. frame-by-frame render
