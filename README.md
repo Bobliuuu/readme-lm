@@ -12,7 +12,7 @@
 
 <div align="center">
 
-<a href="docs/video/explainer.mp4"><img src="docs/video/poster.png" alt="Watch the README-LM explainer video" width="760"></a>
+<a href="docs/video/explainer.mp4"><img src="docs/gifs/poster.gif" alt="Watch the README-LM explainer video" width="760"></a>
 
 ▶️ **[Watch the explainer video](docs/video/explainer.mp4)** (GitHub plays it right on that page)
 
@@ -23,7 +23,7 @@
 
 A README is a static document: it can't run code. So "a language model in a README" really asks one question: **who does the arithmetic?** We built three answers, from a tiny engine on a GitHub Action all the way down to **no Action at all**.
 
-<div align="center"><img src="docs/img/arch-three-versions.svg" alt="The three versions: A normal (minimal Action), B pure MediaWiki, C pure SVG" width="860"></div>
+<div align="center"><img src="docs/gifs/arch-three-versions.gif" alt="The three versions: A normal (minimal Action), B pure MediaWiki, C pure SVG" width="860"></div>
 
 | | 🟠 **A · Normal** | 🟢 **B · Pure MediaWiki** | 🟢 **C · Pure SVG** |
 |---|---|---|---|
@@ -69,7 +69,7 @@ GitHub renders `.mediawiki` files. We wrote a small feed-forward network (an MLP
 {{#ifeq:{{#expr:6*7+2*3+2*2+3*4 > 2*7+3*7+7*4+2*7+7*7+7}}|1|{{#expr:6*7+2*3+2*2+3*4-(2*7+3*7+7*4+2*7+7*7+7)}}|0}}
 ```
 
-<div align="center"><img src="docs/img/mediawiki-render.png" alt="The MediaWiki page as GitHub renders it: a table whose live column is computed by the renderer" width="620"></div>
+<div align="center"><img src="docs/gifs/mediawiki-render.gif" alt="The MediaWiki page as GitHub renders it: a table whose live column is computed by the renderer" width="620"></div>
 
 <sub>The page as GitHub renders it (HTML from GitHub's API, shown with plain styling): the "live (renderer)" column is computed by GitHub and matches the numpy reference. Verified 40/40 on GitHub's production renderer.</sub>
 
@@ -82,7 +82,7 @@ The picture below is **not an image of a computation: it is the computation**. A
 
 <div align="center">
 <img src="demos/svg/latest.svg" alt="Live SVG filter network computed by your browser" width="640">
-<img src="docs/img/svg-net-reference.png" alt="Reference render of the same SVG network (Chrome, 1x)" width="640">
+<img src="docs/gifs/svg-net-reference.gif" alt="Reference render of the same SVG network (Chrome, 1x)" width="640">
 </div>
 
 <sub>Top: the live network (blue = what the filters predicted, white = the actual next character). Bottom: a reference render from Chrome at 1x. ⚠️ Filters run at device pixels: on a Retina display, a zoomed page or a narrow phone the live one will look wrong, and the reference shows what it should compute.</sub>
@@ -105,23 +105,64 @@ Then open the issue link it prints (`qa:`, `gpt2:`, `mediawiki:` or `svg:`) and 
 <a name="architecture"></a>
 ## 🏗️ Architecture
 
+### Flow: issue to Action to profile SVG
+
+```mermaid
+sequenceDiagram
+    participant V as Viewer
+    participant I as GitHub issue
+    participant X as Action runner
+    participant E as Markdown engine
+    participant P as Profile README
+    V->>I: open issue (gpt2: or qa:)
+    I->>X: trigger workflow
+    X->>E: run forward pass
+    E-->>X: answer text
+    X->>I: post reply
+    X->>P: rewrite assets/readme-lm.svg
+```
+
+<details open><summary>Animated version</summary>
+
+<div align="center"><img src="docs/clips/3-version-a-flow.gif" alt="Animated flow: issue, Action, engine, reply, profile SVG" width="760"></div>
+
+</details>
+
+### The three versions
+
+```mermaid
+flowchart LR
+    Q[Question] --> A[A: Action runs a small Python engine]
+    Q --> B[B: MediaWiki formulas, GitHub renders]
+    Q --> C[C: SVG filters, your browser computes]
+    A --> R[Answer]
+    B --> R
+    C --> R
+```
+
+<details open><summary>Animated version</summary>
+
+<div align="center"><img src="docs/clips/2-three-versions.gif" alt="Animated: the three versions" width="760"></div>
+
+</details>
+
 ### The fast version, end to end
 
-![The fast version, end to end: issue, Action, executable Markdown document, engine, reply](docs/img/arch-fast-version.svg)
+<div align="center"><img src="docs/gifs/arch-fast-version.gif" alt="The fast version, end to end: issue, Action, executable Markdown document, engine, reply" width="760"></div>
 
 ### Inside the QA transformer
 
 600K parameters, character-level, 4-bit weights. Small enough that its weights fit inside the profile README (417 KiB, under GitHub's 500 KiB render limit).
 
-![Inside the QA transformer: embedding, three blocks, tied head, argmax](docs/img/arch-qa-transformer.svg)
+<div align="center"><img src="docs/gifs/arch-qa-transformer.gif" alt="Inside the QA transformer: embedding, three blocks, tied head, argmax" width="760"></div>
 
 ### Where the arithmetic can happen
 
-![Where the arithmetic can happen: fast version, pure markup, probed substrates](docs/img/arch-where-arithmetic.svg)
+<div align="center"><img src="docs/gifs/arch-where-arithmetic.gif" alt="Where the arithmetic can happen: fast version, pure markup, probed substrates" width="760"></div>
 
 ### How the pure-markup net works
 
-![How the pure-markup MediaWiki net works](docs/img/arch-mediawiki-net.svg)
+<div align="center"><img src="docs/gifs/arch-mediawiki-net.gif" alt="How the pure-markup MediaWiki net works" width="760"></div>
 
 <a name="tried"></a>
 ## 🔬 What we tried
@@ -139,13 +180,13 @@ The goal was to push the arithmetic into the renderer as far as possible. Each s
 | **Action + numpy** | GitHub runner | real GPT-2 and the QA model both run; about 0.25 s per GPT-2 token on a laptop | the fast version |
 | **Precomputed link graphs** | nothing runs; you click | compiled from real GPT-2 and the QA model; every link resolves | navigation of precomputed predictions, not computation |
 
-![Time to produce one QA answer, by where the arithmetic runs](docs/img/time-per-answer.svg)
+<div align="center"><img src="docs/gifs/time-per-answer.gif" alt="Time to produce one QA answer, by where the arithmetic runs" width="760"></div>
 
 ### SVG filters: exact ops, but the chain does not render
 
 Filter primitives are exact but only 8 bits wide, so the first question was how much precision the model needs. Without retraining, 8-bit activations keep 87.5% of the QA model's answers exactly right in simulation (80% with the filter engine's own rounding noise). Retraining at 8 bits fixes that: the retrained model matches the original's answer on all 698 menu and preset questions through a bit-exact integer reference, and still 96.4% if the renderer adds 2 levels of noise.
 
-![Share of QA answers exactly equal to the reference, by activation precision](docs/img/precision.svg)
+<div align="center"><img src="docs/gifs/precision.gif" alt="Share of QA answers exactly equal to the reference, by activation precision" width="760"></div>
 
 Then every op was built as a filter graph and checked bit-exact in headless Chrome: 26 of 26 pass. The blocker is chaining. Chrome re-evaluates shared filter nodes once per consumer, so cost multiplies with every layer of neurons: a full token step (about 4,800 primitives, 3.2 MB) did not render within 240 s, and the chain only verifies as far as attention. The graph is also valid only at 1x device pixel ratio, and an `<img>` takes no input, so the context would be baked into the file. A product-based dense layer might fix the cost; it is untested. Details: [`trackD/svgops/REPORT.md`](trackD/svgops/REPORT.md); the 8-bit spec and integer reference: [`trackD/qat8/q8_spec.md`](trackD/qat8/q8_spec.md).
 
@@ -153,9 +194,9 @@ Then every op was built as a filter graph and checked bit-exact in headless Chro
 
 A graph can only contain continuations that were compiled. Confident prompts compile well; open-ended text explodes the state space. Merging runs where the model has a single confident continuation shrinks the QA graph about 51 times.
 
-![How long real GPT-2 text stays inside a 2,000-state link graph](docs/img/gpt2-graph-coverage.svg)
+<div align="center"><img src="docs/gifs/gpt2-graph-coverage.gif" alt="How long real GPT-2 text stays inside a 2,000-state link graph" width="760"></div>
 
-![QA click-graph size for 701 questions](docs/img/qa-graph-compression.svg)
+<div align="center"><img src="docs/gifs/qa-graph-compression.gif" alt="QA click-graph size for 701 questions" width="760"></div>
 
 ## 🧩 How each piece works
 
