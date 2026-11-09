@@ -71,13 +71,13 @@ def fig_coverage():
 
 # ---------- 4. QA graph compression (two bars) ----------
 def fig_compress():
-    s = json.load(open(os.path.join(ROOT, "graph/qa/stats.json"))); a, b = s["states_raw"], s["states_after_chain_contraction"]
+    s = json.load(open(os.path.join(ROOT, "graph/qa/stats.json"))); a, b = s["states_raw"], s["states_after_chain_contraction"]; nq = s["questions"]
     W, H, L, R, T = 760, 220, 250, 90, 90; pw = W - L - R
-    o = [head(W, H, "QA click-graph size for 687 questions", "States a reader would have to click through. Runs where the model has a single confident continuation merge into one link.")]
+    o = [head(W, H, f"QA click-graph size for {nq} questions", "States a reader would have to click through. Runs where the model has a single confident continuation merge into one link.")]
     for i, (lab, v) in enumerate([("one state per character", a), ("after merging single-continuation runs", b)]):
         y = T + i * 46; w = max(v / a * pw, 3)
         o.append(f'<text x="{L-12}" y="{y+12}" font-size="12.5" text-anchor="end">{lab}</text><rect class="c1" x="{L}" y="{y}" width="{w:.1f}" height="16" rx="4"/><text x="{L+w+8:.1f}" y="{y+13}" font-size="13" font-weight="600">{v:,}</text>')
-    o.append(f'<text class="t2" x="{L}" y="{T+104}" font-size="12">about {a/b:.0f}x fewer states; every one of the 687 answers still reaches its end state</text>')
+    o.append(f'<text class="t2" x="{L}" y="{T+104}" font-size="12">about {a/b:.0f}x fewer states; every one of the {nq} answers still reaches its end state</text>')
     save("qa-graph-compression.svg", "".join(o))
 
 # ---------- GIF: GPT-2 generating, top-3 per step ----------

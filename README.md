@@ -77,11 +77,11 @@ Then every op was built as a filter graph and checked bit-exact in headless Chro
 
 ### What precomputed graphs can and cannot cover
 
-A graph can only contain continuations that were compiled. Confident prompts compile well; open-ended text explodes the state space. Merging runs where the model has a single confident continuation shrinks the QA graph about 50 times.
+A graph can only contain continuations that were compiled. Confident prompts compile well; open-ended text explodes the state space. Merging runs where the model has a single confident continuation shrinks the QA graph about 51 times.
 
 ![How long real GPT-2 text stays inside a 2,000-state link graph](docs/img/gpt2-graph-coverage.svg)
 
-![QA click-graph size for 687 questions](docs/img/qa-graph-compression.svg)
+![QA click-graph size for 701 questions](docs/img/qa-graph-compression.svg)
 
 ## How each piece works
 
@@ -116,7 +116,7 @@ Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a l
 
 ### Compiled link graphs
 
-`graph/gpt2/` holds 12 real-GPT-2 prompts and `graph/qa/` holds 687 QA questions as click-through pages. Each state is the text so far, and each link is a likely next token or character with its probability. No Action, no JavaScript. This is navigation of precomputed predictions, not computation.
+`graph/gpt2/` holds 12 real-GPT-2 prompts and `graph/qa/` holds 701 QA questions as click-through pages. Each state is the text so far, and each link is a likely next token or character with its probability. No Action, no JavaScript. This is navigation of precomputed predictions, not computation.
 
 ### The character model at the end of this file
 

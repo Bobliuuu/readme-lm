@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Compile the QA transformer (qa_final2.pt, 4-bit QAT weights) into pure-Markdown click-trees: one tree per menu question.
+"""Compile the QA transformer (qa_final2.pt by default, or $QA_CKPT; 4-bit QAT weights) into pure-Markdown click-trees: one tree per menu question.
 State = question + answer text so far. Usage: compile_qa.py OUTDIR [nodes_per_question]"""
 import sys, os, json, numpy as np, torch
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from qa_model import QA, VOC, EOS, V
 import build_qa
 
+QAPT = os.environ.get("QA_CKPT", "qa_final2.pt")   # checkpoint; default unchanged
 dev = "mps" if torch.backends.mps.is_available() else "cpu"
-m = QA().to(dev); m.load_state_dict(torch.load("qa_final2.pt", map_location=dev)); m.set_qat(True); m.eval()
+m = QA().to(dev); m.load_state_dict(torch.load(QAPT, map_location=dev)); m.set_qat(True); m.eval()
 I = {c: i for i, c in enumerate(VOC)}
 TOPK, MINP = 3, 0.10
 
