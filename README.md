@@ -1,100 +1,165 @@
 # README-LM
 
-Language models stored as Markdown. This repo holds three different things, with different limits. The table says where each one's weights live and where its computation happens.
+**Language models stored as Markdown, and how far a document renderer can go toward running them.**
 
-| | What | Weights live in | Compute runs in | Try it |
-|---|---|---|---|---|
-| 1. QA model | 600K-param char-level transformer that answers questions about my public repos | inside the README of my profile repo, [Bobliuuu/Bobliuuu](https://github.com/Bobliuuu/Bobliuuu) (417 KiB total, under GitHub's 500 KiB render limit) | a GitHub Action in the profile repo, numpy | open an issue titled `ask: <question>` on the profile repo |
-| 2. GPT-2 in Markdown | GPT-2 small (124M params), int8 | this repo, `gpt2/`: 339 weight shards plus tokenizer shards, about 112 MB of Markdown files | a GitHub Action in this repo (`mdrt/GPT2.md`), numpy | [open a prefilled issue](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) titled `gpt2: <prompt>` |
-| 3. Clickable model | char-level MLP (3-character context, 92K params) compiled into 2,622 Markdown states | this README, as links | nowhere: no Action, no JavaScript, you click | [start here](#s-the) |
-| 4. Compiled link graphs | real GPT-2 (12 prompts) and the QA transformer (687 questions), as click-through pages in `graph/` | `graph/*.md` | nowhere: no Action, no JavaScript, you click precomputed predictions | [GPT-2 graphs](graph/gpt2/README.md) · [QA graph](graph/qa/README.md) |
-| 5. Self-contained executable Markdown | one `.md` document carrying the engine source, the forward-pass program and a run request; weights by reference | `gpt2/*.md` shards | the engine extracted from the document, run by one line of Python | [`mdrt/GPT2.md`](mdrt/GPT2.md) |
+<div align="center"><img src="docs/img/gpt2-generation.gif" alt="Animation: real GPT-2 generating text one token at a time, with its top-3 next-token probabilities at each step" width="720"></div>
 
-## Try it: `gpt2:` or `qa:`
+<sub>Real GPT-2 small, run from Markdown files, generating a reply token by token (replayed from an actual run: each frame is one token and GPT-2's top-3 candidates).</sub>
 
-Open an issue and put the mode in the title:
+A README is a static document, so "a language model in a README" has to be answered in layers: where do the weights live, and **who does the arithmetic?** This repo ships two answers and records what we learned trying the rest.
 
-- [`gpt2: The meaning of life is`](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is): real GPT-2 small continues your text.
-- [`qa: what is qwentpu`](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+what+is+qwentpu): the 600K-parameter model that knows my public repos answers a question.
+| | **A. The fast one** (what the profile README runs) | **B. The pure-markup one** (no Action, no JavaScript, no runtime of ours) |
+|---|---|---|
+| Models | real GPT-2 small (124M, int8) and a 600K-parameter QA transformer that knows my GitHub | a toy neural net computed by GitHub's own renderer (works, verified live); an SVG-filter version (exact arithmetic verified, full model in progress) |
+| Weights live in | Markdown shards (`gpt2/`, `qa/weights.md`) and the profile README | the page itself |
+| Arithmetic done by | a numpy engine that is extracted from a Markdown document and run by a GitHub Action | GitHub's MediaWiki renderer evaluating `{{#expr}}` / the viewer's browser rendering an SVG filter graph |
+| Speed | seconds to minutes per reply | instant to render; tiny models only |
+| Try it | [`gpt2:` / `qa:` issues](#try-it) | [the MediaWiki net](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) |
 
-A GitHub Action runs the matching executable Markdown document (`mdrt/GPT2.md` or `mdrt/QA.md`: engine source, forward-pass program, tokenizer and weights all live in Markdown), replies with the Markdown that document produced, and shows an animation of the result. Latest QA result:
+## Try it
 
-<div align="center"><img src="qa/latest.svg?v=efc70962" alt="Typing animation of the latest QA answer" width="640"></div>
+- **Ask real GPT-2:** open an issue titled [`gpt2: The meaning of life is`](https://github.com/Bobliuuu/readme-lm/issues/new?template=gpt2.md&title=gpt2%3A+The+meaning+of+life+is) (put your own text after `gpt2:`).
+- **Ask the GitHub model:** open [`qa: what is qwentpu`](https://github.com/Bobliuuu/readme-lm/issues/new?template=qa.md&title=qa%3A+what+is+qwentpu). It only knows my public repos; anything else gets a refusal.
+- **See a README compute with no Action:** open the [MediaWiki net](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki). Every number in its table is evaluated by GitHub's renderer when you load the page.
+- **Click through precomputed models:** [GPT-2 graphs](graph/gpt2/README.md), [QA graph](graph/qa/README.md), or the [character model at the bottom of this file](#s-the).
+- **Run the executable document yourself:** `python3 -c "..." mdrt/GPT2.md` ([how](#the-document-is-the-program)).
 
-## Completely in GitHub markup: a neural net computed by the renderer
+Latest results from the Action (refreshed on every `gpt2:` / `qa:` issue):
 
-[`trackD/mediawiki/README.mediawiki`](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) is a MediaWiki page that GitHub renders. It holds the weights of a toy neural model (2-character context, 12 ReLU hidden units, 5 output bits) and **every multiply-accumulate, ReLU and decode step is a `{{#expr}}` / `{{#ifeq}}` / `{{#switch}}` that GitHub's own renderer evaluates when it renders the page**: no Action, no JavaScript, no runtime of ours. Each row of the table is the model's predicted next character for one context, computed live.
+<div align="center"><img src="gpt2/latest.svg?v=10eec239" alt="Typing animation of the latest GPT-2 output" width="640"><br><img src="qa/latest.svg?v=efc70962" alt="Typing animation of the latest QA answer" width="640"></div>
 
-Verified against a python reference on GitHub's production renderer: 40 of 40 predictions, and all 12 hidden units and 5 logits for the worked example, exactly equal (`trackD/mediawiki/check_live.py`). It is a stunt: trained on only 194 characters (63.6% train exact-match), a 311 KB page for 40 rows, because MediaWiki on GitHub has no variables, templates or loops, so every intermediate value is written out inline. Details and limits: [`trackD/mediawiki/REPORT.md`](trackD/mediawiki/REPORT.md).
+## Architecture
 
-## 4. Compiled link graphs (`graph/`)
+### The fast version, end to end
 
-Pure Markdown navigation, no Action and no JavaScript: GitHub renders the pages and you click.
+```mermaid
+flowchart LR
+    V([Viewer]) -- "opens an issue<br/>gpt2: ... or qa: ..." --> I[GitHub issue]
+    I --> A["GitHub Action runner<br/>(only does I/O)"]
+    A -- "writes the issue text into<br/>the document's run block" --> D["mdrt/GPT2.md or mdrt/QA.md<br/>engine + program + tokenizer<br/>are all Markdown"]
+    W[("weights, as Markdown shards<br/>gpt2/*.md, qa/weights.md")] --> D
+    D -- "the extracted engine runs<br/>the forward pass (numpy)" --> R["rendered Markdown<br/>+ typing animation"]
+    R --> I2[issue reply]
+    R --> P[README image]
+```
 
-- `graph/gpt2/`: real GPT-2 small (read from the `gpt2/` shards), 12 prompts. Each state is the text so far; links are GPT-2's top-3 next tokens (probability at temperature 0.6, at least 8%), at most 2,000 states per prompt, with chain contraction (a run of single-continuation states becomes one link). Coverage is measured and shown in `graph/gpt2/README.md`: confident prompts keep a sampled text inside the graph for 12 tokens 29% to 64% of the time (`Question: What is the capital of France?`, `1, 2, 3, 4, 5,`), while open-ended prompts keep it for 8 tokens only about 1% to 17% of the time. Open-ended text explodes the state space.
-- `graph/qa/`: the 4-bit QA transformer compiled the same way for 687 menu questions. 70,325 raw states contract to 1,399 (about 50x). Following the top-probability links reproduces the model's greedy answer, and every answer path reaches an end state.
-- All links in both graphs resolve (checked).
+### Inside the QA transformer
 
-This is navigation of precomputed predictions, not computation. GitHub's renderer has no input-dependent arithmetic (see `trackB/PROBE.md`, which tests what its sanitizer keeps and strips), so a GPT-2 forward pass cannot run inside a rendered README.
+600K parameters, character-level, 4-bit weights. Small enough that its weights fit inside the profile README (417 KiB, under GitHub's 500 KiB render limit).
 
-## 5. Self-contained executable Markdown (`mdrt/GPT2.md`)
+```mermaid
+flowchart TB
+    T["tokens (86-character vocabulary)"] --> E["embedding 86x128<br/>(shared with the output head)"]
+    E --> B
+    subgraph B["3 identical blocks"]
+        direction TB
+        N1[RMSNorm] --> QKV["linear 128 to 384<br/>(q, k, v)"] --> RP["RoPE on q and k"] --> AT["causal attention<br/>4 heads x 32"] --> O["linear 128 to 128"] --> R1(("+")) --> N2[RMSNorm] --> UP["linear 128 to 512"] --> G[GELU] --> DN["linear 512 to 128"] --> R2(("+"))
+    end
+    B --> FN[final RMSNorm] --> H["tied head 128 to 86"] --> AM["argmax: the next character"]
+```
 
-[`mdrt/GPT2.md`](mdrt/GPT2.md) is one Markdown document that carries: the engine (about 150 lines of Python: shard reader, GPT-2 byte-level BPE, tensor ops, an interpreter for the program block), the GPT-2 forward pass as a declarative program (`embed`, `layernorm`, `linear`, `attention`, `gelu`, `add`, `head`), and a run request. The weights stay in the `gpt2/` Markdown shards, referenced from the document. The only thing outside the Markdown is a Python interpreter and this bootstrap line, which extracts the engine from the document itself and runs it:
+### Where the arithmetic can happen
+
+```mermaid
+flowchart LR
+    subgraph fast["Fast version"]
+        A1["GitHub Action runner<br/>numpy engine from a Markdown document"]
+    end
+    subgraph pure["Pure markup (the secondary build)"]
+        M1["GitHub's MediaWiki renderer<br/>{{#expr}} in the page<br/>WORKS (toy, verified live)"]
+        S1["Viewer's browser rendering an SVG filter graph<br/>exact 8-bit ops verified; full model in progress"]
+    end
+    subgraph probed["Probed, not shipped"]
+        X["XSLT: works, Chrome removes it 2026-11-17"]
+        L["Liquid in a Jekyll build: exact but too slow"]
+        C["CSS + fonts: feasible, slowest, last resort"]
+    end
+    A1 ~~~ M1
+    M1 ~~~ X
+```
+
+### How the pure-markup net works
+
+```mermaid
+flowchart LR
+    W["trained weights<br/>(small integers)"] --> G["gen_mediawiki.py<br/>unrolls every neuron inline"]
+    G --> P["README.mediawiki<br/>{{#expr: ...}} everywhere"]
+    P --> R["GitHub's renderer evaluates<br/>every expression at render time"]
+    R --> T["table: predicted next character<br/>per input context, live"]
+    T -.-> V["check_live.py compares to a python reference:<br/>40/40 exact"]
+```
+
+## What we tried
+
+The goal was to push the arithmetic into the renderer as far as possible. Each substrate was built and checked by a separate probe (reports in [`trackB/`](trackB/PROBE.md), [`trackC/`](trackC/README.md), [`trackD/`](trackD/)); times marked "extrapolated" are projected from measured throughput, not measured end to end.
+
+| Substrate | Where it runs | What happened | Verdict |
+|---|---|---|---|
+| **GitHub's README renderer** | GitHub | strips `<style>`, inline SVG and animation, forms and scripts; its MathJax is typesetting only (no `\def`, no macros; live test) | cannot compute |
+| **MediaWiki `#expr`** | GitHub's renderer | a 2-character-context, 12-unit net evaluated live; 40/40 predictions and all 12 hidden units and 5 logits equal the reference on GitHub's production renderer | **works (toy)**: shipped as the pure-markup version |
+| **SVG filters** | viewer's browser, as a README `<img>` | exact 8-bit multiply, add, matvec, ReLU and lookup tables in Chrome; a 4-8-4 integer MLP matches numpy on 24/24 outputs; GitHub serves a filter SVG byte-identical (tested up to 8.2 MB) and Chrome renders the served copy pixel-identically | **most promising**; full QA model needs 8-bit retraining and is in progress |
+| **Liquid in Jekyll** | GitHub Pages build | exact arithmetic, real-model op chain matches numpy; about 82K to 115K multiply-accumulates per second | too slow: 17 to 22 minutes per answer against a 10-minute build limit (extrapolated) |
+| **XSLT** | browser (Pages) | the full QA answer generated in one transform, identical to numpy: 163 s in Chrome, 197 s in `xsltproc`, a 10.7 MB data file | dead end: Chrome removes XSLT from Stable on 2026-11-17, and XSLT can't read URL input |
+| **CSS + variable fonts** | browser (Pages) | every arithmetic block passes in Chrome; typed input works with no JS; sized at about 0.7 MB of fonts | last resort: 11 to 65 minutes per answer and 3 to 4 weeks of work (extrapolated); the reference implementation has no license, so none of its code is used |
+| **Action + numpy** | GitHub runner | real GPT-2 and the QA model both run; about 0.25 s per GPT-2 token on a laptop | the fast version |
+| **Precomputed link graphs** | nothing runs; you click | compiled from real GPT-2 and the QA model; every link resolves | navigation of precomputed predictions, not computation |
+
+![Time to produce one QA answer, by where the arithmetic runs](docs/img/time-per-answer.svg)
+
+### Why SVG filters are the interesting one, and what limits them
+
+Filter primitives are exact but only 8 bits wide, so the question is how much precision the model needs. In simulation, quantizing every activation to 8 bits keeps 87.5% of the QA model's answers exactly right without retraining (80% with the filter engine's own rounding noise), 10 bits keep 95%. The plan is quantization-aware retraining at 8 bits.
+
+![Share of QA answers exactly equal to the reference, by activation precision](docs/img/precision.svg)
+
+### What precomputed graphs can and cannot cover
+
+A graph can only contain continuations that were compiled. Confident prompts compile well; open-ended text explodes the state space. Merging runs where the model has a single confident continuation shrinks the QA graph about 50 times.
+
+![How long real GPT-2 text stays inside a 2,000-state link graph](docs/img/gpt2-graph-coverage.svg)
+
+![QA click-graph size for 687 questions](docs/img/qa-graph-compression.svg)
+
+## How each piece works
+
+### The QA model (inside a README)
+
+- 3 layers, d=128, 4 heads, RoPE, RMSNorm, tied embeddings, character-level, about 600K parameters.
+- Weights are 4-bit group-quantized (quantization-aware training, group size 32), zlib-compressed and base64-encoded. In the profile repo they sit inside its README (417 KiB in total); here they are also the Markdown file [`qa/weights.md`](qa/weights.md).
+- Trained on about 690 question/answer facts written by agents from my public READMEs, plus curated facts and about 380 off-topic refusals ([`qa/*.jsonl`](qa/)), for 110 epochs. It is mostly memorization.
+
+### GPT-2 small as Markdown files
+
+GPT-2 small does not fit in one README (124M parameters against 500 KiB), so the weights are sharded across Markdown files:
+
+- `gpt2/weights/part-*.md`: 339 files, each a fenced block of base64(zlib(int8)), about 112 MB in total.
+- `gpt2/tokenizer/part-*.md` and `gpt2/manifest.md`: the BPE vocabulary and merges, and the tensor table.
+- Quantization: int8 per output channel. On a 44-token test passage, perplexity was 13.5 (int8) versus 13.4 (fp32) and top-1 agreement was 38 of 44. That is a small test, not a benchmark.
+- `gpt2/run.py`: a numpy-only forward pass with a KV cache and a pure-Python byte-level BPE.
+
+### The document is the program
+
+[`mdrt/GPT2.md`](mdrt/GPT2.md) and [`mdrt/QA.md`](mdrt/QA.md) are single Markdown documents that carry the engine source (shard reader, tokenizer, tensor ops, an interpreter), the forward pass written as a declarative program (`embed`, `layernorm`, `linear`, `attention`, `gelu`, `add`, `head`) and a run request. Weights stay in the shards. The only thing outside the Markdown is Python and one bootstrap line that extracts the engine from the document and runs it:
 
 ```sh
 python3 -c "import re,sys;t=open(sys.argv[1]).read();exec(re.search(chr(96)*4+'python mdrt-engine\n(.*?)\n'+chr(96)*4,t,re.S).group(1))" mdrt/GPT2.md
 ```
 
-Greedy output for 24 tokens is identical to `gpt2/run.py` (verified), in about 46 s on a laptop CPU. GitHub's renderer only displays this document; the computation is done by the extracted engine, so this is Markdown as the complete artifact, not Markdown executing itself. What GitHub's own math renderer could and could not do is measured in `trackB/PROBE.md` (stock MathJax: macros and delimiter pattern matching work, but there is no arithmetic, no conditionals and about 1,000 macro substitutions per expression).
+Output matches `gpt2/run.py` exactly (verified), about 46 s for 24 tokens on a laptop CPU. GitHub's renderer only displays these documents; the extracted engine does the arithmetic. The workflow `.github/workflows/ask.yml` writes an issue's text into the run block, runs the document, replies with the Markdown it produced, and renders the animation. It does no arithmetic of its own.
 
-## 1. QA model inside a README
+### The pure-markup net (MediaWiki)
 
-- Architecture: 3 layers, d=128, 4 heads, RoPE, RMSNorm, tied embeddings, character-level, about 600K parameters.
-- Weights: 4-bit group-quantized (quantization-aware training, group size 32), zlib-compressed and base64-encoded, embedded in the profile repo's README. Together with the README text the file is 417 KiB, under GitHub's 500 KiB render limit.
-- How it runs: a GitHub Action in the profile repo reads the weights out of its own README.md, runs numpy inference (`qa_infer.py`, `ask.py`), answers issues titled `ask: <question>`, replies, closes the issue, and refreshes an animated typing SVG.
-- Training data: about 690 question/answer facts written by agents from my public READMEs, plus curated facts and about 380 off-topic refusals (`qa/*.jsonl`). Training is 110 epochs and mostly memorization.
+[`trackD/mediawiki/README.mediawiki`](https://github.com/Bobliuuu/readme-lm/blob/main/trackD/mediawiki/README.mediawiki) is a MediaWiki page that GitHub renders with WikiCloth. It holds the weights of a toy next-character model (2-character context, 12 ReLU units, 5 output bits) as small integers. **Every multiply-accumulate, ReLU and decode step is a `{{#expr}}`, `{{#ifeq}}` or `{{#switch}}` evaluated by GitHub's renderer**, so no Action, JavaScript or runtime of ours is involved. It is a stunt: trained on 194 characters (63.6% train exact-match), and because MediaWiki on GitHub has no variables, templates or loops, every intermediate value is written out inline (311 KB for 40 rows). One renderer quirk: WikiCloth 0.8.3's `#ifexpr` always takes the true branch, so the page uses `#ifeq` on an `#expr` comparison instead. Details: [`trackD/mediawiki/REPORT.md`](trackD/mediawiki/REPORT.md).
 
-Limits:
+### Compiled link graphs
 
-- It is mostly a lookup table in weights. Near-exact phrasings of trained questions work; unusual phrasings can fail or produce garbled text. In a holdout experiment on held-out phrasings, character-4gram F1 was about 0.5.
-- The facts were written by agents and were not independently verified against the READMEs, so some may be wrong.
-- Questions outside my GitHub get a refusal. It has no general knowledge.
-- More facts need more parameters than fit in 500 KiB.
+`graph/gpt2/` holds 12 real-GPT-2 prompts and `graph/qa/` holds 687 QA questions as click-through pages. Each state is the text so far, and each link is a likely next token or character with its probability. No Action, no JavaScript. This is navigation of precomputed predictions, not computation.
 
-## 2. GPT-2 small in Markdown
+### The character model at the end of this file
 
-<div align="center"><img src="gpt2/latest.svg?v=10eec239" alt="Typing animation of the latest GPT-2 output" width="640"></div>
+A character-level MLP (3-character context, 92K parameters, trained on public README text) compiled into 2,622 Markdown states, one line each, with links to its top next characters. Start at [`t` `h` `e`](#s-the) and keep track of the text yourself. `build.py` trains and compiles it; `compose.py` checks that every link resolves.
 
-The animation above is the latest generation, refreshed by the Action each time an issue titled `gpt2: ...` is opened.
-
-GPT-2 small does not fit in one README: 124M parameters is far more than 500 KiB. So the weights are sharded across Markdown files in this repo, and the computation happens in a GitHub Action runner, not in the README and not in your browser.
-
-- `gpt2/weights/part-*.md`: 339 files, each a fenced block of base64(zlib(int8)), about 112 MB in total.
-- `gpt2/tokenizer/part-*.md`: the BPE vocabulary and merges, same encoding.
-- `gpt2/manifest.md`: the tensor table (names, shapes, quantization layout).
-- `gpt2/run.py`: a numpy-only GPT-2 forward pass with a KV cache and a pure-Python byte-level BPE (needs `numpy` and `regex`). It reads the shards directly. On a laptop CPU, loading takes about 3 s and generation about 0.25 s per token.
-- Quantization: int8 per output channel. On a 44-token test passage, perplexity was 13.5 (int8) versus 13.4 (fp32), and top-1 next-token agreement was 38/44. That is a small test, not a benchmark.
-- Workflow `.github/workflows/ask.yml` answers issues titled `gpt2: <text>` or `qa: <question>`. It writes the issue text into the run block of the matching executable document (`mdrt/GPT2.md` or `mdrt/QA.md`), runs the document (engine, program, tokenizer and weights all come from Markdown), then replies with the Markdown that document produced plus a typing animation, and closes the issue. The workflow itself only does I/O. The `gpt2:` reply samples 40 tokens at temperature 0.8.
-
-Limits: GPT-2 is a base language model, not a chat assistant. It continues text, and the output can be wrong, repetitive or odd. Each reply takes however long an Action run takes.
-
-Inspiration: Shubham Patil's [GPT-2 in pure CSS](https://gpt2css.shubhampatil.dev) ([blog post](https://shubhampatil.dev/blog/gpt2-css)), which does the computation in the browser. This project differs: the weights are stored as Markdown and the computation happens in a GitHub Action.
-
-## 3. Clickable compiled model
-
-A character-level MLP (27 chars, 3-character context, 92K parameters, trained on public README text) is compiled ahead of time into 2,622 Markdown states. Each state is one line with an anchor and links to its top next-character predictions with probabilities. There is no Action and no JavaScript; you click through the links and keep track of the text yourself. Every link is validated by `compose.py`.
-
-Start at [`t` `h` `e`](#s-the). The compiled states are at the end of this file.
-
-How it was built:
-
-1. `build.py` trains the MLP (`27 chars -> 24-d embeddings x 3 -> 256 -> 256 -> 27`) and runs BFS from the start state over the network's top-5 predictions (probability >= 4%).
-2. Each reachable context becomes one line: an anchor plus one link per prediction (character, probability, target state).
-3. `compose.py` checks that every link resolves to an existing anchor.
-
-## How much neural inference fits in a README?
-
-GitHub stops rendering a README at 500 KiB. Measured on this model, same training recipe, same link budget per state:
+GitHub stops rendering a README at 500 KiB, which limits this approach: states grow as 27^k.
 
 | Context | Possible states | Reachable states compiled | Markdown size | Val. perplexity | Fits in 500 KiB? |
 |---|---|---|---|---|---|
@@ -104,40 +169,56 @@ GitHub stops rendering a README at 500 KiB. Measured on this model, same trainin
 | 4 chars (top-4, p>=8%) | 531,441 | 9,309 | 744 KiB | 4.8 | no |
 | 5 chars (top-3, p>=15%) | 14,348,907 | 10,066 | 688 KiB | 5.4 | no |
 
-States grow as 27^k, links per state stay fixed, so a finite-context neural LM hits the 500 KiB wall at k=4. A real transformer, with an unbounded sliding-window state, can't be compiled this way. Only a quantized, tiny-context one could.
+## Honest limits
 
+- The two shipped versions are not the same thing. The fast version computes outside GitHub's renderer, on a GitHub-hosted runner. The pure-markup version computes inside GitHub's renderer, but only as a toy.
+- No substrate we tried runs a GPT-2-sized model inside a README. GitHub's renderer has no input-dependent arithmetic, so anything computed there is a fixed function of the file.
+- The QA model is mostly a lookup table in weights: near-exact phrasings work, unusual ones can fail (on held-out phrasings, character-4gram F1 was about 0.5). Its training facts were written by agents and not independently verified against the READMEs.
+- GPT-2 is a base language model, not a chat assistant; it continues text and can be wrong, repetitive or odd.
+- Probe results come from local emulation of GitHub's renderers unless a report says it was checked on github.com.
+
+## Credits
+
+Inspired by Shubham Patil's [GPT-2 in pure CSS](https://gpt2css.shubhampatil.dev) ([blog post](https://shubhampatil.dev/blog/gpt2-css)), which computes in the browser, and by a reported GPT-2 in pdfLaTeX. This project differs in storing the weights as Markdown and in asking how much of the arithmetic a document renderer can do.
 
 ## Reproduce
 
 ```
 pip install torch numpy regex
 
-# 1. QA model (train, then pack int4 weights into a README between markers)
-python3 build_qa.py
-python3 train_qa.py 110 0.0 final      # epochs, holdout fraction, tag
+# QA model: train, then pack int4 weights into a README between markers
+python3 build_qa.py && python3 train_qa.py 110 0.0 final
 python3 export_qa.py qa_final.pt README.md
 python3 ask.py README.md out.svg 0 "what is qwentpu"
 
-# 2. GPT-2 from the Markdown shards (numpy + regex only)
+# GPT-2 from the Markdown shards
 python3 gpt2/run.py "The meaning of life is" 60
 
-# 3. Clickable model
-python3 build.py 3 5 0.04 100000       # train + compile k=3
-python3 compose.py                     # link validation + render
+# executable documents, charts, graphs
+python3 mdrt/build_docs.py
+python3 docs/make_figs.py <saved gpt2: issue reply>
+python3 graph/compile_gpt2.py graph/gpt2 2000 28 && python3 graph/compile_qa.py graph/qa 260
+
+# the MediaWiki net: generate, check locally, check GitHub's own render
+python3 trackD/mediawiki/gen_mediawiki.py && python3 trackD/mediawiki/check.py
+
+# the character model at the end of this file
+python3 build.py 3 5 0.04 100000 && python3 compose.py
 ```
 
 ## File map
 
 | Path | Purpose |
 |---|---|
-| `qa_model.py` | QA transformer + 4-bit fake-quant (QAT) |
-| `build_qa.py`, `qa/*.jsonl` | QA dataset: facts, phrasings, refusals |
-| `train_qa.py` | QA training |
-| `export_qa.py` | pack int4 weights into a README between markers |
-| `qa_infer.py`, `ask.py`, `gen.py` | numpy inference with KV cache; answer and animated SVG |
-| `gpt2/` | GPT-2 shards (`weights/`, `tokenizer/`), `manifest.md`, `run.py`, `convert.py` |
-| `.github/workflows/ask.yml`, `.github/ISSUE_TEMPLATE/*.md` | the `gpt2:` and `qa:` issue workflow and forms |
-| `build.py`, `compose.py` | compile and validate the clickable model |
+| `qa_model.py`, `build_qa.py`, `train_qa.py`, `export_qa.py`, `qa/` | the QA transformer: model, data, training, packing, weights |
+| `qa_infer.py`, `ask.py`, `gen.py` | numpy inference and animated SVGs |
+| `gpt2/` | GPT-2 shards, manifest, `run.py`, `convert.py` |
+| `mdrt/` | the executable documents `GPT2.md` and `QA.md`, their engines, `build_docs.py` |
+| `.github/workflows/ask.yml`, `.github/ISSUE_TEMPLATE/` | the `gpt2:` and `qa:` flow |
+| `graph/` | compiled click-through graphs and their compilers |
+| `trackB/`, `trackC/`, `trackD/` | probe reports and builds: GitHub renderer, five substrates, MediaWiki and SVG-filter work |
+| `docs/` | figure generator and images used in this README |
+| `build.py`, `compose.py` | compile and validate the character model |
 
 ## Compiled model (2,622 states)
 
