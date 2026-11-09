@@ -1,0 +1,39 @@
+[
+ {
+  "op": "RMSNorm 128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 11,
+  "svg_bytes": 10513,
+  "render_s": 24.97,
+  "sat": 0.0
+ },
+ {
+  "op": "residual add pa=256 pb=256 za=128 zb=128 zo=128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10423,
+  "render_s": 6.63
+ },
+ {
+  "op": "residual add pa=37 pb=230 za=128 zb=124 zo=128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10442,
+  "render_s": 6.01
+ },
+ {
+  "op": "residual add pa=190 pb=200 za=128 zb=128 zo=120",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10437,
+  "render_s": 5.84
+ }
+]

@@ -1,0 +1,74 @@
+[
+ {
+  "op": "linear 128->128 (o0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 132,
+  "svg_bytes": 85109,
+  "render_s": 0.89,
+  "d": 240,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 128->384 (qkv0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 3072,
+  "prims": 390,
+  "svg_bytes": 246089,
+  "render_s": 1.18,
+  "d": 236,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 128->512 (u0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 4096,
+  "prims": 519,
+  "svg_bytes": 334826,
+  "render_s": 1.47,
+  "d": 299,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 512->128 (dn0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 394,
+  "svg_bytes": 307698,
+  "render_s": 0.91,
+  "d": 242,
+  "chunks": [
+   171,
+   171,
+   170
+  ],
+  "sat_frac": 0.02734375
+ },
+ {
+  "op": "linear 128->128 (o1) via <img>",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 132,
+  "svg_bytes": 86447,
+  "render_s": 0.76,
+  "d": 292,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ }
+]

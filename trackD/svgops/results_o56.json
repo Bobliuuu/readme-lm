@@ -1,0 +1,50 @@
+[
+ {
+  "op": "token embedding lookup (86x128, per-channel LUT on id pixel)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 132,
+  "svg_bytes": 109704,
+  "render_s": 0.03
+ },
+ {
+  "op": "argmax tournament over 86 logits (feMorphology dilate/erode, id in R)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 8,
+  "prims": 14,
+  "svg_bytes": 8739,
+  "render_s": 0.04,
+  "got": [
+   12,
+   0,
+   18,
+   0,
+   60,
+   15,
+   66,
+   18
+  ],
+  "ref": [
+   12,
+   0,
+   18,
+   0,
+   60,
+   15,
+   66,
+   18
+  ]
+ },
+ {
+  "op": "RoPE (per-position cos/sin const rasters, 128 ch = 4 heads x 16 pairs)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 16,
+  "svg_bytes": 12308,
+  "render_s": 0.04,
+  "max_err_vs_float": 0.980000000000004
+ }
+]

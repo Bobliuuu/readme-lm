@@ -1,0 +1,26 @@
+[
+ {
+  "op": "causal attention T=8 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 67,
+  "svg_bytes": 26982,
+  "render_s": 0.18,
+  "maxerr": 0,
+  "sat": 0.109375,
+  "ref_std": 70.2722662055731
+ },
+ {
+  "op": "causal attention T=16 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 68,
+  "svg_bytes": 39325,
+  "render_s": 0.63,
+  "maxerr": 0,
+  "sat": 0.0556640625,
+  "ref_std": 60.0567485663579
+ }
+]

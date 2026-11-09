@@ -1,0 +1,270 @@
+[
+ {
+  "op": "linear 128->128 (o0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 132,
+  "svg_bytes": 85100,
+  "render_s": 0.08,
+  "d": 240,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 128->384 (qkv0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 3072,
+  "prims": 390,
+  "svg_bytes": 246176,
+  "render_s": 0.15,
+  "d": 236,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 128->512 (u0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 4096,
+  "prims": 519,
+  "svg_bytes": 334958,
+  "render_s": 0.19,
+  "d": 299,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "linear 512->128 (dn0)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 394,
+  "svg_bytes": 307703,
+  "render_s": 0.27,
+  "d": 242,
+  "chunks": [
+   171,
+   171,
+   170
+  ],
+  "sat_frac": 0.0244140625
+ },
+ {
+  "op": "linear 128->128 (o1) via <img>",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 132,
+  "svg_bytes": 86455,
+  "render_s": 0.09,
+  "d": 291,
+  "chunks": [
+   128
+  ],
+  "sat_frac": 0.0
+ },
+ {
+  "op": "LUT gelu",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 6175,
+  "render_s": 0.04
+ },
+ {
+  "op": "LUT exp",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 6175,
+  "render_s": 0.02
+ },
+ {
+  "op": "LUT reciprocal",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 6175,
+  "render_s": 0.04
+ },
+ {
+  "op": "LUT rsqrt",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 6175,
+  "render_s": 0.04
+ },
+ {
+  "op": "LUT square",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 6175,
+  "render_s": 0.04
+ },
+ {
+  "op": "RMSNorm 128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 11,
+  "svg_bytes": 10548,
+  "render_s": 0.04,
+  "sat": 0.0
+ },
+ {
+  "op": "residual add pa=256 pb=256 za=128 zb=128 zo=128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10423,
+  "render_s": 0.04
+ },
+ {
+  "op": "residual add pa=37 pb=230 za=128 zb=124 zo=128",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10442,
+  "render_s": 0.04
+ },
+ {
+  "op": "residual add pa=190 pb=200 za=128 zb=128 zo=120",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 3,
+  "svg_bytes": 10437,
+  "render_s": 0.04
+ },
+ {
+  "op": "token embedding lookup (86x128, per-channel LUT on id pixel)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 132,
+  "svg_bytes": 109704,
+  "render_s": 0.05
+ },
+ {
+  "op": "argmax tournament over 86 logits (feMorphology dilate/erode, id in R)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 8,
+  "prims": 14,
+  "svg_bytes": 8739,
+  "render_s": 0.04
+ },
+ {
+  "op": "RoPE (per-position cos/sin const rasters, 128 ch = 4 heads x 16 pairs)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 16,
+  "svg_bytes": 12308,
+  "render_s": 0.04,
+  "max_err_vs_float": 0.980000000000004
+ },
+ {
+  "op": "glyph atlas via feDisplacementMap (id pixel -> 16x24 glyph, viewBox-cropped)",
+  "PASS": true,
+  "prims": 7,
+  "svg_bytes": 17847
+ },
+ {
+  "op": "causal attention T=8 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 67,
+  "svg_bytes": 26982,
+  "render_s": 0.16,
+  "maxerr": 0,
+  "sat": 0.109375,
+  "ref_std": 70.2722662055731
+ },
+ {
+  "op": "causal attention T=16 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 2048,
+  "prims": 68,
+  "svg_bytes": 39325,
+  "render_s": 0.61,
+  "maxerr": 0,
+  "sat": 0.0556640625,
+  "ref_std": 60.0567485663579
+ },
+ {
+  "op": "causal attention T=32 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 4096,
+  "prims": 68,
+  "svg_bytes": 62239,
+  "render_s": 4.18,
+  "maxerr": 0,
+  "sat": 0.031982421875,
+  "ref_std": 49.270371759186865
+ },
+ {
+  "op": "causal attention T=64 (4 heads x 32)",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 8192,
+  "prims": 68,
+  "svg_bytes": 103454,
+  "render_s": 20.01,
+  "maxerr": 0,
+  "sat": 0.0096435546875,
+  "ref_std": 36.74237695686086
+ },
+ {
+  "op": "row gathers (stretch + compact) via feDisplacementMap T=8",
+  "T": 8,
+  "m": 1,
+  "P": 9,
+  "prims": 29,
+  "PASS": true
+ },
+ {
+  "op": "row gathers (stretch + compact) via feDisplacementMap T=16",
+  "T": 16,
+  "m": 2,
+  "P": 17,
+  "prims": 30,
+  "PASS": true
+ },
+ {
+  "op": "row gathers (stretch + compact) via feDisplacementMap T=32",
+  "T": 32,
+  "m": 6,
+  "P": 37,
+  "prims": 30,
+  "PASS": true
+ },
+ {
+  "op": "row gathers (stretch + compact) via feDisplacementMap T=64",
+  "T": 64,
+  "m": 32,
+  "P": 65,
+  "prims": 30,
+  "PASS": true
+ }
+]

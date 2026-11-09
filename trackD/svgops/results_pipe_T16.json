@@ -1,0 +1,54 @@
+[
+ {
+  "stage": "emb",
+  "PASS": true,
+  "mism": 0,
+  "of": 2048,
+  "prims": 133,
+  "svg_bytes": 109721,
+  "render_s": 0.0
+ },
+ {
+  "stage": "L0.n1",
+  "PASS": true,
+  "mism": 0,
+  "of": 2048,
+  "prims": 139,
+  "svg_bytes": 115109,
+  "render_s": 0.0
+ },
+ {
+  "stage": "L0.q",
+  "PASS": true,
+  "mism": 0,
+  "of": 2048,
+  "prims": 269,
+  "svg_bytes": 193915,
+  "render_s": 0.2
+ },
+ {
+  "stage": "L0.qr",
+  "PASS": true,
+  "mism": 0,
+  "of": 2048,
+  "prims": 540,
+  "svg_bytes": 357294,
+  "render_s": 0.3
+ },
+ {
+  "stage": "L0.ao",
+  "PASS": true,
+  "mism": 0,
+  "of": 2048,
+  "prims": 614,
+  "svg_bytes": 374271,
+  "render_s": 2.7
+ },
+ {
+  "stage": "L0.o",
+  "PASS": null,
+  "note": "render failed/timeout after 28s: Page.screenshot: Target crashed \nCall log:\n  - taking page screenshot\n  - waitin",
+  "prims": 743,
+  "svg_bytes": 457049
+ }
+]

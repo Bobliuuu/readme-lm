@@ -1,0 +1,47 @@
+[
+ {
+  "op": "LUT gelu",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 12655,
+  "render_s": 0.95
+ },
+ {
+  "op": "LUT exp",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 12655,
+  "render_s": 0.67
+ },
+ {
+  "op": "LUT reciprocal",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 12655,
+  "render_s": 1.1
+ },
+ {
+  "op": "LUT rsqrt",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 12655,
+  "render_s": 0.72
+ },
+ {
+  "op": "LUT square",
+  "PASS": true,
+  "mismatches": 0,
+  "of": 1024,
+  "prims": 2,
+  "svg_bytes": 12655,
+  "render_s": 0.72
+ }
+]

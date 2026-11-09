@@ -1,0 +1,9 @@
+[
+ {
+  "stage": "glyph",
+  "PASS": null,
+  "note": "render failed/timeout after 240s: Page.screenshot: Timeout 239892ms exceeded.\nCall log:\n  - taking page screenshot",
+  "prims": 4827,
+  "svg_bytes": 3169947
+ }
+]

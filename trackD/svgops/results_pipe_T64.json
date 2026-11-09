@@ -1,0 +1,20 @@
+[
+ {
+  "stage": "L0.q",
+  "PASS": true,
+  "mism": 0,
+  "of": 8192,
+  "prims": 269,
+  "svg_bytes": 193929,
+  "render_s": 0.5
+ },
+ {
+  "stage": "L0.ao",
+  "PASS": true,
+  "mism": 0,
+  "of": 8192,
+  "prims": 614,
+  "svg_bytes": 383576,
+  "render_s": 23.1
+ }
+]

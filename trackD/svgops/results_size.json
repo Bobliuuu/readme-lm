@@ -1,0 +1,24 @@
+[
+ {
+  "T": 16,
+  "prims": 4830,
+  "svg_MB": 3.18,
+  "region": [
+   2072,
+   314
+  ]
+ },
+ {
+  "T": 64,
+  "prims": 4830,
+  "svg_MB": 3.208,
+  "region": [
+   2072,
+   4298
+  ]
+ },
+ {
+  "T": 192,
+  "error": "T too large for 2-stage gather"
+ }
+]
