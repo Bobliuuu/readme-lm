@@ -1,0 +1,247 @@
+# Spec for ~/video-readme-maker:  python3 ~/video-readme-maker/vrm.py all README.spec.yml
+# Numbers come from tools/readme_data.py -> results/derived/readme_data.json (derived from files in this repo).
+project:
+  name: README-LM
+  emoji: "🧠"
+  tagline: "A real neural language model compiled into a README, and an honest map of who does the arithmetic"
+  repo: Bobliuuu/readme-lm
+hero:
+  title: README-LM
+  subtitle: "who does the arithmetic when the document is static?"
+  chips: [GPT-2 small as Markdown, 600K QA model in a README, MediaWiki net, SVG filter net]
+theme: {accent: "#58a6ff", accent2: "#d95926", accent3: "#f2c14e", good: "#3ddc97"}
+readme_out: README.md
+assets_dir: assets
+badges:
+  - {label: versions, message: "3", color: 58a6ff}
+  - {label: GPT-2, message: "124M params, int8", color: d95926}
+  - {label: QA model, message: "600K params, 4-bit", color: d95926}
+  - {label: MediaWiki, message: "computed by GitHub", color: 1a7f37}
+  - {label: SVG filters ops, message: "{{ n.ops_pass.text }}/{{ n.ops_all.text }} bit-exact", color: 1a7f37}
+  - {label: python, message: "3.x + numpy", color: 3776ab, logo: python}
+nav:
+  - {emoji: "🎬", label: Video, anchor: video}
+  - {emoji: "✨", label: The idea, anchor: idea}
+  - {emoji: "📊", label: Numbers, anchor: results}
+  - {emoji: "🧩", label: How it works, anchor: how-it-works}
+  - {emoji: "🕹️", label: Try it, anchor: try}
+  - {emoji: "⚠️", label: Honest limits, anchor: caveats}
+  - {emoji: "📚", label: Full README, anchor: full}
+  - {emoji: "🗺️", label: Repo map, anchor: repo-map}
+
+numbers:
+  gpt2_shards: {file: results/derived/readme_data.json, path: gpt2.shards}
+  gpt2_mb: {file: results/derived/readme_data.json, path: gpt2.mb, unit: " MB"}
+  qa_kib: {file: results/derived/readme_data.json, path: qa.weights_kib, unit: " KiB"}
+  qa_questions: {file: results/derived/readme_data.json, path: qa_graph.questions}
+  qa_raw: {file: results/derived/readme_data.json, path: qa_graph.states_raw, fmt: "{:,.0f}"}
+  qa_small: {file: results/derived/readme_data.json, path: qa_graph.states_small, fmt: "{:,.0f}"}
+  qa_shrink: {file: results/derived/readme_data.json, path: qa_graph.shrink_x, fmt: "{:.0f}", unit: "x"}
+  gpt2_prompts: {file: results/derived/readme_data.json, path: gpt2_graphs.prompts}
+  ops_all: {file: results/derived/readme_data.json, path: svgops.ops}
+  ops_pass: {file: results/derived/readme_data.json, path: svgops.pass}
+  mw_ok: {file: results/derived/readme_data.json, path: mediawiki.ok}
+  mw_of: {file: results/derived/readme_data.json, path: mediawiki.of}
+  mdrt_docs: {file: results/derived/readme_data.json, path: mdrt.docs}
+
+intro: |
+  <a id="video"></a>
+  A README is a static document: it cannot run code. So "a language model in a README" really asks one question: **who does the arithmetic?**
+  This repo builds three answers and is explicit about what actually runs. **Version A** stores a real GPT-2 small (124M parameters, int8, {{ n.gpt2_shards.text }} Markdown shards, about {{ n.gpt2_mb.text }} on disk)
+  and a 600K-parameter question-answering transformer (weights file {{ n.qa_kib.text }}) as Markdown, and a tiny engine written in Markdown runs them on a GitHub Action.
+  **Version B** is a small MLP written as MediaWiki formulas that GitHub's own renderer evaluates. **Version C** is a small MLP drawn as SVG filters that your browser evaluates.
+  B and C are toys (not transformers), and nothing we tried runs a GPT-2-sized model inside the renderer itself.
+
+video:
+  url: ""
+  caption: "Explainer video (with voice-over and captions): the puzzle, the three versions, what is measured, and the limits"
+  mp4: video/readme_lm_explainer.mp4
+  gif: video/preview.gif
+  srt: video/readme_lm_explainer.srt
+  poster: video/poster.png
+  out_dir: video/.render
+  fps: 24
+  max_mb: 22
+  render_crf: 18
+  concurrency: 4
+  music: true
+  voice: {engine: openai, voice: alloy, model: gpt-4o-mini-tts, tempo: 1.2}
+  scenes:
+    - type: title
+      title: README-LM
+      subtitle: A language model that lives in a README
+      chips: [GPT-2 small, QA transformer, MediaWiki, SVG filters]
+      say: "README L M: can a README run a language model? This is a short, honest tour of three answers, what actually runs in each, and where the limits are."
+    - type: problem
+      heading: "The puzzle: who does the arithmetic?"
+      bullets:
+        - "A README is static: GitHub strips scripts and styles"
+        - "Its MathJax only typesets; it cannot define a macro"
+        - "An SVG image does render, filters and all"
+        - "So the question is where the multiplications happen"
+      say: "A README is a static document. GitHub strips scripts and styles, and even its math rendering only typesets, it cannot define a macro. We measured that. But an S V G image does render, filters included, and GitHub renders MediaWiki pages. So the real question is: who does the arithmetic?"
+    - type: cards
+      heading: "Three versions, three answers"
+      cards:
+        - {title: "A · Normal", sub: "GPT-2 small + 600K QA model", lines: ["weights and engine are Markdown", "a minimal GitHub Action runs one line of Python"]}
+        - {title: "B · Pure MediaWiki", sub: "a toy MLP as formulas", lines: ["GitHub's renderer does every multiply", "{{ n.mw_ok.text }} of {{ n.mw_of.text }} live predictions match the reference"]}
+        - {title: "C · Pure SVG", sub: "a toy MLP as SVG filters", lines: ["your browser's filter engine computes", "no Action, no code"]}
+      footer: "B and C are small feed-forward networks, not transformers"
+      say: "Version A is the real thing. A real GPT-2 small and a six hundred thousand parameter question answering model are stored as Markdown, and a small engine, also written in Markdown, runs them on a GitHub Action. Version B is a tiny network written as MediaWiki formulas, so GitHub's own renderer does the arithmetic, and {{ n.mw_ok.numtext }} of {{ n.mw_of.numtext }} live predictions match the reference. Version C is a tiny network drawn as S V G filters, computed by your browser. B and C are toys, and they are not transformers."
+    - type: architecture
+      diagram: flow
+      heading: "Version A, end to end"
+      say: "In version A, you open an issue. A workflow extracts the engine from a Markdown document and runs the forward pass in numpy. The reply is posted on the issue, and the profile animation is rewritten with the answer."
+    - type: stat
+      number: gpt2_shards
+      kicker: "GPT-2 small stored as Markdown files"
+      label: "shards"
+      sub: "about {{ n.gpt2_mb.text }} of base64 on disk, int8 weights"
+      say: "GPT-2 small does not fit in one README, so its weights are split across {{ n.gpt2_shards.numtext }} Markdown shards. The question answering model is small enough that its weights fit inside the profile README."
+    - type: chart
+      chart: coverage
+      say: "A different route is precomputed link graphs. For {{ n.gpt2_prompts.numtext }} real GPT-2 prompts we compiled click through pages. This chart shows how long a sampled continuation stays inside a two thousand state graph. Confident prompts compile well, open ended text leaves the graph quickly. This is navigation of precomputed predictions, not computation."
+    - type: chart
+      chart: qa_graph
+      say: "For the question answering model, {{ n.qa_questions.numtext }} questions compile into {{ n.qa_raw.numtext }} raw states. Merging runs with a single confident continuation shrinks that to {{ n.qa_small.numtext }}, about {{ n.qa_shrink.numtext }} times smaller."
+    - type: stat
+      number: ops_pass
+      kicker: "SVG filter ops checked bit-exact in headless Chrome"
+      label: "of {{ n.ops_all.text }} pass"
+      sub: "matmul, RMSNorm, RoPE, causal attention, argmax, glyph atlas"
+      say: "On the SVG side, every individual operation was built as a filter graph and checked bit exact in headless Chrome: {{ n.ops_pass.numtext }} of {{ n.ops_all.numtext }} pass. The blocker is chaining them. A full transformer token step does not render in Chrome, which is why the shipped network is a two layer M L P."
+    - type: caveats
+      heading: "Honest limits"
+      bullets:
+        - "The fast version computes on a GitHub runner, outside the renderer"
+        - "The pure-markup versions compute inside, but only as toys"
+        - "No substrate we tried runs a GPT-2-sized model inside a README"
+        - "The QA model is mostly memorisation; GPT-2 is a base model"
+      say: "The limits matter. The fast version computes on a GitHub runner, outside the renderer. The pure markup versions compute inside it, but only as toys. No substrate we tried runs a GPT two sized model inside a README. The question answering model is mostly memorisation, and GPT two is a base model that continues text, not a chat assistant."
+    - type: end
+      title: README-LM
+      subtitle: "Code, probes and the full README are in the repo"
+      say: "The code, the probe reports for each substrate, and the full original README are all in the repo."
+
+tables:
+  - id: ops
+    title: "SVG filter linear layers, bit-exact in headless Chrome (trackD/svgops/results_all.json)"
+    file: results/derived/readme_data.json
+    rows_path: svgops_rows
+    columns:
+      - {key: op, title: Op}
+      - {key: prims, title: "Filter primitives", align: right}
+      - {key: kb, title: "SVG size (KiB)", align: right, fmt: "{:,.0f}"}
+
+charts:
+  - id: coverage
+    type: bar
+    title: "GPT-2 link graphs: chance a continuation is still in the graph after 8 tokens"
+    subtitle: "12 prompts, 2,000 states each, temperature 0.6 (graph/gpt2/stats.json)"
+    better: higher
+    file: results/derived/readme_data.json
+    rows_path: coverage
+    label: prompt
+    y: pct
+    unit: "%"
+    fmt: "{:.1f}"
+  - id: qa_graph
+    type: bar
+    title: "QA click graph: states before and after merging confident runs"
+    subtitle: "701 questions (graph/qa/stats.json)"
+    better: lower
+    items:
+      - {label: "raw states", number: qa_raw}
+      - {label: "after merging", number: qa_small, highlight: true}
+
+diagrams:
+  - id: flow
+    title: "Version A: issue to Action to profile animation"
+    nodes:
+      - {id: v, label: "Viewer", sub: "opens a gpt2: or qa: issue", col: 0, row: 0, kind: io}
+      - {id: a, label: "GitHub Action", sub: "one line of Python", col: 1, row: 0, kind: accent}
+      - {id: e, label: "Markdown engine", sub: "mdrt/GPT2.md, QA.md", col: 2, row: 0, kind: store}
+      - {id: w, label: "Weights", sub: "Markdown shards / README block", col: 2, row: 1, kind: store}
+      - {id: r, label: "Reply + profile SVG", sub: "answer posted, animation rewritten", col: 1, row: 1, kind: io}
+    edges:
+      - {from: v, to: a, label: issue}
+      - {from: a, to: e, label: extract + run}
+      - {from: w, to: e, label: read}
+      - {from: e, to: r, label: answer}
+
+sections:
+  - title: The idea in one minute
+    emoji: "✨"
+    id: idea
+    body: |
+      <div align="center"><img src="docs/gifs/arch-three-versions.gif" alt="The three versions: A normal (minimal Action), B pure MediaWiki, C pure SVG" width="860"></div>
+
+      | | 🟠 **A · Normal** | 🟢 **B · Pure MediaWiki** | 🟢 **C · Pure SVG** |
+      |---|---|---|---|
+      | **What it is** | real **GPT-2 small** (124M, int8) and a **600K QA model** that knows my repos | a **small MLP written as MediaWiki formulas** (not a transformer) | a **small MLP drawn as SVG filters** (not a transformer) |
+      | **Who computes** | a ~150-line engine inside a Markdown document, run by one line of Python on a GitHub Action | **GitHub's own renderer** evaluates every `{{ '{{' }}#expr}}` | **your browser's filter engine** |
+      | **Needs an Action?** | yes, a minimal one | no | no |
+      | **Honest scope** | real models; a minute or a few per reply | a toy (2-character context, 12 units) | a toy (7-character context, 224 units); Chrome at 100% zoom on a 1x display |
+  - title: Numbers from the repo
+    emoji: "📊"
+    id: results
+    body: "Every number below is read from files in this repo by `tools/readme_data.py`."
+    highlights:
+      - {label: "GPT-2 shards", number: gpt2_shards}
+      - {label: "SVG ops bit-exact", number: ops_pass}
+      - {label: "QA graph shrink", number: qa_shrink}
+      - {label: "QA weights file", number: qa_kib}
+    charts: [coverage, qa_graph]
+    tables: [ops]
+    after: |
+      The MediaWiki page was checked against GitHub's production renderer: {{ n.mw_ok.text }} of {{ n.mw_of.text }} live next-character predictions equal the integer reference ([trackD/mediawiki/REPORT.md](trackD/mediawiki/REPORT.md)).
+      Per-op SVG results: [trackD/svgops/results_all.json](trackD/svgops/results_all.json). Everything else (precision study, substrates tried, character model, timings) is in the [full README](docs/README_FULL.md).
+  - title: How it works
+    emoji: "🧩"
+    id: how-it-works
+    body: "The weights are Markdown (GPT-2 as {{ n.gpt2_shards.text }} base64 shards; the QA model as one block). The engine is Markdown too: one document carries the interpreter source, the forward-pass program and the run request. All an Action does is extract and run it."
+    diagrams: [flow]
+    images:
+      - {src: docs/gifs/arch-fast-version.gif, alt: "The fast version, end to end", width: "85%"}
+      - {src: docs/img/gpt2-generation.gif, alt: "Real GPT-2 generating text one token at a time with its top-3 probabilities", width: "70%"}
+    details:
+      - summary: "Version B: pure MediaWiki"
+        body: |
+          GitHub renders `.mediawiki` files. The small feed-forward network (not a transformer) is written as MediaWiki formulas, so GitHub's renderer does every multiply-accumulate when the page loads. It is a toy: 2-character context, 12 hidden units.
+          <div align="center"><img src="docs/gifs/mediawiki-render.gif" alt="The MediaWiki page as GitHub renders it" width="620"></div>
+      - summary: "Version C: pure SVG"
+        body: |
+          A 7-character-context, 224-unit MLP written as SVG filter primitives (`feConvolveMatrix`, `feComponentTransfer`, `feMorphology`, `feDisplacementMap`). It is not a transformer, and it only renders correctly at 1x device pixels.
+          <div align="center"><img src="docs/gifs/svg-net-reference.gif" alt="Reference render of the SVG network" width="620"></div>
+  - title: Try it
+    emoji: "🕹️"
+    id: try
+    body: |
+      Open an issue in this repo and replace `example text` in the title: the prefixes are `gpt2:`, `qa:`, `mediawiki:` and `svg:`. An Action runs the engine and rewrites the animation at the top of the profile.
+      <div align="center"><img src="docs/gifs/issue-flow.gif" alt="Clicking a link opens an issue with the title prefilled; the Action replies with the answer" width="720"></div>
+
+      Deploy it on your own profile with `scripts/deploy.sh --dry-run` then `scripts/deploy.sh` (see [DEPLOY.md](DEPLOY.md)).
+      Run the executable document yourself or GPT-2 from the shards: `python3 gpt2/run.py "The meaning of life is" 60`.
+  - title: Full original README
+    emoji: "📚"
+    id: full
+    body: "The complete previous README (all substrates tried, the precision study, the character model, reproduction commands, credits) is kept as [docs/README_FULL.md](docs/README_FULL.md)."
+
+caveats:
+  - "The two shipped versions are not the same thing: the fast version computes outside GitHub's renderer, on a GitHub-hosted runner; the pure-markup version computes inside it, but only as a toy."
+  - "No substrate we tried runs a GPT-2-sized model inside a README. GitHub's renderer has no input-dependent arithmetic, so anything computed there is a fixed function of the file."
+  - "The QA model is mostly a lookup table in weights: near-exact phrasings work, unusual ones can fail. Its training facts were written by agents and not independently verified."
+  - "GPT-2 is a base language model, not a chat assistant; it continues text and can be wrong, repetitive or odd."
+  - "The SVG-filter version chains only as a two-layer MLP; the individual transformer ops are exact but the full chain does not render in Chrome."
+  - "Probe results come from local emulation of GitHub's renderers unless a report says it was checked on github.com."
+repo_map:
+  - {path: qa_model.py, desc: "the QA transformer: model, data, training, packing"}
+  - {path: gpt2/, desc: "GPT-2 Markdown shards, manifest, run.py"}
+  - {path: mdrt/, desc: "the executable Markdown documents GPT2.md and QA.md"}
+  - {path: graph/, desc: "compiled click-through graphs and their compilers"}
+  - {path: trackD/, desc: "probe reports and builds: GitHub renderer, other substrates, MediaWiki and SVG filters"}
+  - {path: docs/, desc: "figures, GIFs and README_FULL.md (the complete earlier README)"}
+  - {path: tools/readme_data.py, desc: "derives README and video numbers from repo files"}
+  - {path: README.spec.yml, desc: "spec for video-readme-maker"}
+  - {path: video/, desc: "explainer mp4, srt, poster, preview.gif (generated)"}
+footer: "Generated with video-readme-maker from README.spec.yml and files in this repo."

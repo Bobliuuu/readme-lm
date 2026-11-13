@@ -20,3 +20,4 @@ out/model_k*.md
 __pycache__/
 gpt2work/
 __pycache__/
+video/.render/

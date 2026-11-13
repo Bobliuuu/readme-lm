@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 692" width="980" height="692" role="img" aria-label="GPT-2 link graphs: chance a continuation is still in the graph after 8 tokens">
+<rect width="980" height="692" rx="16" fill="#0b0f17"/>
+<text x="32" y="44" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-weight="700" font-size="22" fill="#e6edf6">GPT-2 link graphs: chance a continuation is still in the graph after 8 tokens</text>
+<text x="32" y="68" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" fill="#8a98ad">12 prompts, 2,000 states each, temperature 0.6 (graph/gpt2/stats.json)</text>
+<text x="324" y="118" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">1, 2, 3, 4, 5,</text>
+<rect x="338" y="96" width="492.0" height="30" rx="6" fill="#263044"/>
+<text x="840.0" y="117" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">70.7%</text>
+<text x="324" y="164" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Question: What is the capital of F</text>
+<rect x="338" y="142" width="375.8" height="30" rx="6" fill="#263044"/>
+<text x="723.8" y="163" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">54.0%</text>
+<text x="324" y="210" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">The Eiffel Tower is located in</text>
+<rect x="338" y="188" width="116.2" height="30" rx="6" fill="#263044"/>
+<text x="464.2" y="209" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">16.7%</text>
+<text x="324" y="256" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">The capital of France is</text>
+<rect x="338" y="234" width="80.0" height="30" rx="6" fill="#263044"/>
+<text x="428.0" y="255" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">11.5%</text>
+<text x="324" y="302" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Question: Who wrote Hamlet? Answer</text>
+<rect x="338" y="280" width="60.5" height="30" rx="6" fill="#263044"/>
+<text x="408.5" y="301" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">8.7%</text>
+<text x="324" y="348" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">GitHub is</text>
+<rect x="338" y="326" width="55.7" height="30" rx="6" fill="#263044"/>
+<text x="403.7" y="347" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">8.0%</text>
+<text x="324" y="394" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">The meaning of life is</text>
+<rect x="338" y="372" width="39.7" height="30" rx="6" fill="#263044"/>
+<text x="387.7" y="393" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">5.7%</text>
+<text x="324" y="440" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Water boils at 100 degrees</text>
+<rect x="338" y="418" width="34.8" height="30" rx="6" fill="#263044"/>
+<text x="382.8" y="439" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">5.0%</text>
+<text x="324" y="486" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">To be, or not to be,</text>
+<rect x="338" y="464" width="14.6" height="30" rx="6" fill="#263044"/>
+<text x="362.6" y="485" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">2.1%</text>
+<text x="324" y="532" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Markdown is</text>
+<rect x="338" y="510" width="9.0" height="30" rx="6" fill="#263044"/>
+<text x="357.0" y="531" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">1.3%</text>
+<text x="324" y="578" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Once upon a time</text>
+<rect x="338" y="556" width="4.9" height="30" rx="6" fill="#263044"/>
+<text x="352.9" y="577" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">0.7%</text>
+<text x="324" y="624" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">Roses are red, violets are</text>
+<rect x="338" y="602" width="2.0" height="30" rx="6" fill="#263044"/>
+<text x="350.0" y="623" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">0.2%</text>
+<text x="948" y="678" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" fill="#8a98ad">source: results/derived/readme_data.json · higher is better</text>
+</svg>

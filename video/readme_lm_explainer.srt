@@ -1,0 +1,164 @@
+1
+00:00:00,400 --> 00:00:03,292
+README L M: can a README run a language model?
+
+2
+00:00:03,292 --> 00:00:09,263
+This is a short, honest tour of three answers, what actually runs in each, and where the limits
+
+3
+00:00:09,263 --> 00:00:09,515
+are.
+
+4
+00:00:10,510 --> 00:00:12,519
+A README is a static document.
+
+5
+00:00:12,519 --> 00:00:18,880
+GitHub strips scripts and styles, and even its math rendering only typesets, it cannot define a
+
+6
+00:00:18,880 --> 00:00:19,281
+macro.
+
+7
+00:00:19,281 --> 00:00:20,420
+We measured that.
+
+8
+00:00:20,420 --> 00:00:26,111
+But an S V G image does render, filters included, and GitHub renders MediaWiki pages.
+
+9
+00:00:26,111 --> 00:00:29,392
+So the real question is: who does the arithmetic?
+
+10
+00:00:30,390 --> 00:00:32,020
+Version A is the real thing.
+
+11
+00:00:32,020 --> 00:00:37,494
+A real GPT-2 small and a six hundred thousand parameter question answering model are stored as
+
+12
+00:00:37,494 --> 00:00:42,443
+Markdown, and a small engine, also written in Markdown, runs them on a GitHub Action.
+
+13
+00:00:42,443 --> 00:00:47,800
+Version B is a tiny network written as MediaWiki formulas, so GitHub's own renderer does the
+
+14
+00:00:47,800 --> 00:00:51,410
+arithmetic, and 40 of 40 live predictions match the reference.
+
+15
+00:00:51,410 --> 00:00:55,894
+Version C is a tiny network drawn as S V G filters, computed by your browser.
+
+16
+00:00:55,894 --> 00:00:58,689
+B and C are toys, and they are not transformers.
+
+17
+00:00:59,690 --> 00:01:01,589
+In version A, you open an issue.
+
+18
+00:01:01,589 --> 00:01:06,991
+A workflow extracts the engine from a Markdown document and runs the forward pass in numpy.
+
+19
+00:01:06,991 --> 00:01:12,273
+The reply is posted on the issue, and the profile animation is rewritten with the answer.
+
+20
+00:01:13,270 --> 00:01:18,617
+GPT-2 small does not fit in one README, so its weights are split across 339 Markdown shards.
+
+21
+00:01:18,617 --> 00:01:23,964
+The question answering model is small enough that its weights fit inside the profile README.
+
+22
+00:01:24,960 --> 00:01:27,631
+A different route is precomputed link graphs.
+
+23
+00:01:27,631 --> 00:01:31,073
+For 12 real GPT-2 prompts we compiled click through pages.
+
+24
+00:01:31,073 --> 00:01:36,356
+This chart shows how long a sampled continuation stays inside a two thousand state graph.
+
+25
+00:01:36,356 --> 00:01:40,689
+Confident prompts compile well, open ended text leaves the graph quickly.
+
+26
+00:01:40,689 --> 00:01:44,428
+This is navigation of precomputed predictions, not computation.
+
+27
+00:01:45,430 --> 00:01:51,519
+For the question answering model, 701 questions compile into 72,061 raw states.
+
+28
+00:01:51,519 --> 00:01:58,918
+Merging runs with a single confident continuation shrinks that to 1,425, about 51 times smaller.
+
+29
+00:01:59,920 --> 00:02:05,230
+On the SVG side, every individual operation was built as a filter graph and checked bit exact
+
+30
+00:02:05,230 --> 00:02:07,172
+in headless Chrome: 26 of 26 pass.
+
+31
+00:02:07,172 --> 00:02:08,828
+The blocker is chaining them.
+
+32
+00:02:08,828 --> 00:02:14,195
+A full transformer token step does not render in Chrome, which is why the shipped network is a
+
+33
+00:02:14,195 --> 00:02:15,109
+two layer M L P.
+
+34
+00:02:16,110 --> 00:02:17,131
+The limits matter.
+
+35
+00:02:17,131 --> 00:02:20,932
+The fast version computes on a GitHub runner, outside the renderer.
+
+36
+00:02:20,932 --> 00:02:24,393
+The pure markup versions compute inside it, but only as toys.
+
+37
+00:02:24,393 --> 00:02:28,081
+No substrate we tried runs a GPT two sized model inside a README.
+
+38
+00:02:28,081 --> 00:02:33,471
+The question answering model is mostly memorisation, and GPT two is a base model that continues
+
+39
+00:02:33,471 --> 00:02:35,003
+text, not a chat assistant.
+
+40
+00:02:36,000 --> 00:02:41,113
+The code, the probe reports for each substrate, and the full original README are all in the
+
+41
+00:02:41,113 --> 00:02:41,394
+repo.
+
