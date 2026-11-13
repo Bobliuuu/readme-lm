@@ -18,6 +18,8 @@ badges:
   - {label: QA model, message: "600K params, 4-bit", color: d95926}
   - {label: MediaWiki, message: "computed by GitHub", color: 1a7f37}
   - {label: SVG filters ops, message: "{{ n.ops_pass.text }}/{{ n.ops_all.text }} bit-exact", color: 1a7f37}
+  - {label: release, message: "v0.1.0", color: 58a6ff, link: "https://github.com/Bobliuuu/readme-lm/releases/tag/v0.1.0"}
+  - {label: Hugging Face, message: "Bobliu/readme-lm", color: ffd21e, logo: huggingface, link: "https://huggingface.co/Bobliu/readme-lm"}
   - {label: python, message: "3.x + numpy", color: 3776ab, logo: python}
 nav:
   - {emoji: "🎬", label: Video, anchor: video}
